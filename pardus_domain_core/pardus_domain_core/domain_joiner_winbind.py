@@ -17,7 +17,7 @@ def leave(user, password):
     return subprocess.run(["net", "ads", "leave", "-U", user], input=password, text=True, capture_output=True)
 
 def domain_info():
-    process = subprocess.run(["net", "ads", "testjoin"]) # domaine bağlı olup olmadığını kontrol eder if returns "Join is OK", join is successful; otherwise failed
+    process = subprocess.run(["net", "ads", "testjoin"])
     return get_returncode(process)
 
 def list_users():

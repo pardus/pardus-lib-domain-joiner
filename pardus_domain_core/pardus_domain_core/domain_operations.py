@@ -3,10 +3,10 @@ import subprocess
 import sys
 import apt
 
-from . import domain_joiner_realmd
-from . import domain_joiner_winbind
-from . import config_manager
-from . import update_krb5_config
+from pardus_domain_core import domain_joiner_realmd
+from pardus_domain_core import domain_joiner_winbind
+from pardus_domain_core import config_manager
+from pardus_domain_core import update_krb5_config
 
 from locale import gettext as _
 
@@ -84,6 +84,11 @@ def fail_and_exit(msg):
     sys.exit(1)
 
 
+def restore_config_file(restore_files):
+    for backup, original in restore_files.items():
+        if os.path.exists(backup):
+            config_manager.restore_config_file(backup, original)
+
 def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings):
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
@@ -97,7 +102,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings)
         fail_and_exit("Domain discovery failed.")
 
     try:
-        print("domain:", domain)
+        # print("domain:", domain)
         print(_("Joining the domain..."))
         messages = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
         client = f"{user}@{domain.upper()}"
@@ -128,19 +133,42 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings)
             print(_("This computer has been successfully added to the domain."))
         else:
             print(_("This computer cannot be joined to the domain!"))
+            restore_files = {
+                "/etc/hosts.old": "/etc/hosts",
+                "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
+                "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
+            }
+            restore_config_file(restore_files)
+            config_manager.restore_hostname()
 
     except subprocess.CalledProcessError as e:
         print(_("Error while joining domain. Exit Code:"), e.stderr)
+        restore_files = {
+            "/etc/hosts.old": "/etc/hosts",
+            "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
+            "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
+        }
+        restore_config_file(restore_files)
+        config_manager.restore_hostname()
     except Exception as e:
-        print("error", e)
+        print("Error: ", e)
+        restore_files = {
+            "/etc/hosts.old": "/etc/hosts",
+            "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
+            "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
+        }
+        restore_config_file(restore_files)
+        config_manager.restore_hostname()
 
 
-def handle_winbind_join(domain, user, passwd):
+def handle_winbind_join(comp_name, domain, user, passwd):
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
 
     try:
+        print(_("Updating /etc/krb5.conf file..."))
         update_krb5_config.update_krb5_conf(domain)
+        print(_("Updated /etc/krb5.conf file..."))
         config_manager.update_samba_conf_for_winbind(domain)
 
         try:
@@ -149,28 +177,52 @@ def handle_winbind_join(domain, user, passwd):
                 print(_("Domain discovered..."))
         except subprocess.CalledProcessError as e:
             print(_("Error discovering domain. Exit Code:"), e.returncode)
+            restore_files = {
+                "/etc/krb5.conf.old": "/etc/krb5.conf",
+                "/etc/samba/smb.conf.old": "/etc/samba/smb.conf"
+            }
+            restore_config_file(restore_files)
             fail_and_exit("Domain discovery failed.")
         
         config_manager.update_nsswitch_conf()
-
-        domain_user = f"{user}@{domain}"
-        subprocess.run(["kinit", domain_user], capture_output=True)
-        msg = domain_joiner_winbind.join(domain, user, passwd)
-
-        # print("msg:", msg)
+        # domain_user = f"{user}@{domain}"
+        # result = subprocess.run(["kinit", domain_user], capture_output=True)
+        # print("result:",result, "\n", result.returncode)
+        config_manager.update_hostname_file(comp_name, domain)
+        config_manager.update_hosts_file(comp_name, domain)
+        msg = domain_joiner_winbind.join(user, passwd)
+        print("msg: ", msg)
 
         subprocess.run(
             ["systemctl", "restart", "smbd", "nmbd", "winbind"], capture_output=True
         )
+
         result = domain_joiner_winbind.domain_info()
+        
         if result:
             print(_("This computer has been successfully added to the domain."))
         else:
             print(_("This computer cannot be joined to the domain!"))
+            restore_files = {
+                "/etc/krb5.conf.old": "/etc/krb5.conf",
+                "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
+                "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
+                "/etc/hosts.old": "/etc/hosts"
+            }
+            restore_config_file(restore_files)
+            config_manager.restore_hostname()
     except subprocess.CalledProcessError as e:
         print(_("Error while joining domain. Exit Code:"), e.stderr)
+        restore_files = {
+            "/etc/krb5.conf.old": "/etc/krb5.conf",
+            "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
+            "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
+            "/etc/hosts.old": "/etc/hosts"
+        }
+        restore_config_file(restore_files)
+        config_manager.restore_hostname()
     except Exception as e:
-        print("error", e)
+        print("Error: ", e)
 
 
 def join(
@@ -204,7 +256,7 @@ def join(
             ]
             check_and_install_packages(winbind_pkg_list)
 
-            handle_winbind_join(domain, user, passwd)
+            handle_winbind_join(comp_name, domain, user, passwd)
         else:
             print(
                 _(
@@ -225,22 +277,19 @@ def leave(realmd=None, winbind=None, user=None, password=None):
             "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
             "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
         }
-
-        for backup, original in restore_files.items():
-            if os.path.exists(backup):
-                config_manager.restore_config_file(backup, original)
+        restore_config_file(restore_files)
+        config_manager.restore_hostname()
 
     elif winbind:
         domain_joiner_winbind.leave(user, password)
         restore_files = {
+            "/etc/hosts.old": "/etc/hosts",
             "/etc/krb5.conf.old": "/etc/krb5.conf",
             "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
             "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
         }
-
-        for backup, original in restore_files.items():
-            if os.path.exists(backup):
-                config_manager.restore_config_file(backup, original)
+        restore_config_file(restore_files)
+        config_manager.restore_hostname()
 
 def list(realmd=None, winbind=None):
     if realmd:

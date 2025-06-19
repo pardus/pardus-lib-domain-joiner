@@ -13,26 +13,27 @@ if os.path.exists(changelog):
     except:
         print("debian/changelog format is wrong for get version")
         version = ""
-    f = open('pardus-domain-core/__version__', 'w')
+    f = open('pardus_domain_core/__version__', 'w')
     f.write(version)
     f.close()
 
 data_files = [
-    ("/usr/share/pardus/pardus-domain-settings/pardus-domain-core/",
+    ("/usr/share/pardus/pardus-domain-settings/pardus_domain_core/",
      [
-        "pardus-domain-core/__init__.py",
-        "pardus-domain-core/config_manager.py",
-        "pardus-domain-core/domain_joiner_ldap.py",
-        "pardus-domain-core/domain_joiner_realmd.py",
-        "pardus-domain-core/domain_joiner_winbind.py",
-        "pardus-domain-core/domain_operations.py",
-        "pardus-domain-core/__version__",
+        "pardus_domain_core/__init__.py",
+        "pardus_domain_core/config_manager.py",
+        "pardus_domain_core/domain_joiner_ldap.py",
+        "pardus_domain_core/domain_joiner_realmd.py",
+        "pardus_domain_core/domain_joiner_winbind.py",
+        "pardus_domain_core/domain_operations.py",
+        "pardus_domain_core/update_krb5_config.py",
+        "pardus_domain_core/__version__",
      ]),
     ("/usr/share/pam-configs/", ["data/pardus-pam-config"]),
 ]
 
 setup(
-    name="pardus-domain-core",
+    name="pardus_domain_core",
     version=version,
     packages=find_packages(),
     data_files=data_files,

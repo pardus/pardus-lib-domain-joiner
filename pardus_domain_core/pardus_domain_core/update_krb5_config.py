@@ -105,6 +105,4 @@ def update_krb5_conf(domain):
         if domain not in known_domains and f".{domain}" not in known_domains:
             lines = insert_into_section(lines, "domain_realm", domain_realm_block)
         
-        print(_("updating /etc/krb5.conf file..."))
         write_krb5_conf(krb5_file, lines)
-        print(_("updated /etc/krb5.conf file..."))

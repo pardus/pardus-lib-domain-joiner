@@ -9,7 +9,7 @@ from locale import gettext as _
 def set_hostname(comp_name):
     backup_config_file("/etc/hostname", "/etc/hostname.old")
     subprocess.call(["hostnamectl", "hostname", comp_name])
-    print(_("changed hostname: "), comp_name)
+    print(_("Changed hostname: "), comp_name)
 
 
 def restore_hostname():
@@ -51,14 +51,14 @@ def update_hostname_file(comp_name, domain):
     hostname_file = "/etc/hostname"
     with open(hostname_file, "r") as file:
         current_hostname = file.readline().strip()
-        print(_("checking /etc/hostname file..."))
+        print(_("Checking /etc/hostname file..."))
         if comp_name + "." + domain not in current_hostname:
-            print(_("added domain name to /etc/hostname file"))
+            print(_("Added domain name to /etc/hostname file"))
             with open(hostname_file, "w") as file:
                 new_hostname = "{}.{}".format(comp_name, domain)
                 file.write(new_hostname)
         else:
-            print(_("done"))
+            print(_("Done"))
 
 
 def update_hosts_file(comp_name, domain):
@@ -68,7 +68,7 @@ def update_hosts_file(comp_name, domain):
     backup_config_file(hosts_file, hosts_file_backup)
     with open(hosts_file, "r") as file:
         lines = file.readlines()
-    print(_("checking /etc/hosts file..."))
+    print(_("Checking /etc/hosts file..."))
     new_hosts_file = []
     domain_exists = False
 
@@ -86,9 +86,9 @@ def update_hosts_file(comp_name, domain):
         file.writelines(new_hosts_file)
 
     if domain_exists:
-        print(_("done"))
+        print(_("Done"))
     else:
-        print(_("added domain name to /etc/hosts file"))
+        print(_("Added domain name to /etc/hosts file"))
 
 
 def rewrite_conf(file, backup_file, settings):
@@ -128,9 +128,9 @@ def update_samba_conf_for_sssd(domain):
             "syslog": 0,
         },
     }
-    print(_("updating /etc/samba/smb.conf file..."))
+    print(_("Updating /etc/samba/smb.conf file..."))
     rewrite_conf(smb_file, smb_file_backup, samba_settings)
-    print(_("updated /etc/samba/smb.conf file..."))
+    print(_("Updated /etc/samba/smb.conf file..."))
 
 
 def update_sssd_conf(domain):
@@ -158,11 +158,11 @@ def update_sssd_conf(domain):
             "ad_gpo_ignore_unreadable": True,
         },
     }
-    print(_("updating /etc/sssd/sssd.conf file..."))
+    print(_("Updating /etc/sssd/sssd.conf file..."))
     rewrite_conf(sssd_file, sssd_file_backup, sssd_settings)
     os.chmod(sssd_file, 600)
     subprocess.call(["systemctl", "restart ", "sssd"])
-    print(_("updated /etc/sssd/sssd.conf file..."))
+    print(_("Updated /etc/sssd/sssd.conf file..."))
 
 
 def update_samba_conf_for_winbind(domain):
@@ -196,9 +196,9 @@ def update_samba_conf_for_winbind(domain):
             "restrict anonymous" : "2"
         },
     }
-    print(_("updating /etc/samba/smb.conf file for winbind..."))
+    print(_("Updating /etc/samba/smb.conf file for winbind..."))
     rewrite_conf(smb_file, smb_file_backup, samba_settings)
-    print(_("updated /etc/samba/smb.conf file for winbind..."))
+    print(_("Updated /etc/samba/smb.conf file for winbind..."))
 
 
 def update_nsswitch_conf():
@@ -231,7 +231,7 @@ def update_nsswitch_conf():
             new_lines.append(line)
     
 
-    print(_("updating /etc/nsswitch.conf file for winbind..."))    
+    print(_("Updating /etc/nsswitch.conf file for winbind..."))    
     with open(nsswitch_file, "w") as file:
         file.writelines(new_lines)
-    print(_("updated /etc/nsswitch.conf file for winbind..."))
+    print(_("Updated /etc/nsswitch.conf file for winbind..."))

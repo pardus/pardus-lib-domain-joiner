@@ -10,14 +10,8 @@ Package: pardus-domain-core
 Architecture: all
 Depends: python3 (>=3.5),
          python3-apt,
-         realmd,
          krb5-user, 
 	 samba, 
-	 sssd, 
-	 libsss-sudo, 
-	 packagekit, 
-	 adcli, 
-	 sssd-tools, 
 	 cifs-utils, 
 	 smbclient,
 	 python3-ldap
