@@ -161,7 +161,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings)
         config_manager.restore_hostname()
 
 
-def handle_winbind_join(comp_name, domain, user, passwd):
+def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
 
@@ -190,27 +190,39 @@ def handle_winbind_join(comp_name, domain, user, passwd):
         # print("result:",result, "\n", result.returncode)
         config_manager.update_hostname_file(comp_name, domain)
         config_manager.update_hosts_file(comp_name, domain)
-        msg = domain_joiner_winbind.join(user, passwd)
+        msg = domain_joiner_winbind.join(user, passwd, ouaddress)
         print("msg: ", msg)
 
-        subprocess.run(
-            ["systemctl", "restart", "smbd", "nmbd", "winbind"], capture_output=True
-        )
+        messages = msg.stdout.split("\n")[-2]
 
-        result = domain_joiner_winbind.domain_info()
-        
-        if result:
-            print(_("This computer has been successfully added to the domain."))
-        else:
-            print(_("This computer cannot be joined to the domain!"))
+        if "a bad username or authentication information" in messages:
             restore_files = {
+                "/etc/hosts.old": "/etc/hosts",
                 "/etc/krb5.conf.old": "/etc/krb5.conf",
                 "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
-                "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
-                "/etc/hosts.old": "/etc/hosts"
+                "/etc/nsswitch.conf.old": "/etc/nsswitch.conf"
             }
             restore_config_file(restore_files)
-            config_manager.restore_hostname()
+            fail_and_exit("Preauthentication failed!")
+        elif "Joined" in messages:
+            subprocess.run(
+                ["systemctl", "restart", "smbd", "nmbd", "winbind"], capture_output=True
+            )
+
+            result = domain_joiner_winbind.domain_info()
+            
+            if result:
+                print(_("This computer has been successfully added to the domain."))
+            else:
+                print(_("This computer cannot be joined to the domain!"))
+                restore_files = {
+                    "/etc/krb5.conf.old": "/etc/krb5.conf",
+                    "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
+                    "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
+                    "/etc/hosts.old": "/etc/hosts"
+                }
+                restore_config_file(restore_files)
+                config_manager.restore_hostname()
     except subprocess.CalledProcessError as e:
         print(_("Error while joining domain. Exit Code:"), e.stderr)
         restore_files = {
@@ -256,7 +268,7 @@ def join(
             ]
             check_and_install_packages(winbind_pkg_list)
 
-            handle_winbind_join(comp_name, domain, user, passwd)
+            handle_winbind_join(comp_name, domain, user, passwd, ouaddress)
         else:
             print(
                 _(

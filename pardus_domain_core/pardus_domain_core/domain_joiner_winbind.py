@@ -10,7 +10,9 @@ def discover():
     process = subprocess.run(["net", "ads", "info"])
     get_returncode(process)
 
-def join(user, password):
+def join(user, password, ouaddress):
+    """ouaddress.split("cn")[-1]
+    ou = f"'-ou={ouaddress}'" """
     return subprocess.run(["net", "ads", "join", "-v", "-U", user], input=password, text=True, capture_output=True)
 
 def leave(user, password):
