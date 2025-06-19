@@ -19,7 +19,7 @@ def leave(user, password):
     return subprocess.run(["net", "ads", "leave", "-U", user], input=password, text=True, capture_output=True)
 
 def domain_info():
-    process = subprocess.run(["net", "ads", "testjoin"])
+    process = subprocess.run(["net", "ads", "testjoin"], capture_output=True)
     return get_returncode(process)
 
 def list_users():
