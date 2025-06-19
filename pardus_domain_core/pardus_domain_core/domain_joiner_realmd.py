@@ -23,7 +23,7 @@ def leave():
     subprocess.run(["realm", "leave", "-v"], check=True)
 
 def list_realm():
-    return subprocess.run(["realm", "list"])
+    return subprocess.run(["realm", "list"], capture_output=True)
 
 def permit(user=None,domain=None,all=None):
     if all:
