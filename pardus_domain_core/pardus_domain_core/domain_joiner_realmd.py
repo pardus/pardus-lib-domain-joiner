@@ -5,11 +5,12 @@ def discover(domain):
     return process
 
 def join(domain, user, passwd, ouaddress):
-    ou = f"--computer-ou={ouaddress}"
-    join_command = [
-        "realm", "join", "-v", "-U", user, ou, domain.upper()
-    ]
-    """join_command = ['realm join -v --computer-ou="' + ouaddress + '" --user="' + user + "@" + domain.upper() + '" ' + domain.lower()]"""
+    join_command = ["realm", "join", "-v", "-U", user, domain.upper()]
+
+    if ouaddress is not None:
+        ou = f"--computer-ou={ouaddress}"
+        join_command = ["realm", "join", "-v", "-U", user, ou, domain.upper()]
+
     print(join_command)
     process = subprocess.run(
         join_command, input=passwd, text=True, capture_output=True
