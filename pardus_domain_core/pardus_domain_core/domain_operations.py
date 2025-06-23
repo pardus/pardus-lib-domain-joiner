@@ -305,6 +305,16 @@ def leave(realmd=None, winbind=None, user=None, password=None):
 
 def list(realmd=None, winbind=None):
     if realmd:
-        domain_joiner_realmd.list_realm()
+        process = domain_joiner_realmd.list_realm()
+        if process.returncode == 0:
+            realm_name = process.stdout.decode("utf-8").split("\n")[0]
+            return realm_name
     elif winbind:
-        domain_joiner_winbind.domain_info()
+        domain_info = domain_joiner_winbind.domain_info()
+        if domain_info.returncode == 0:
+            process = domain_joiner_winbind.discover()
+            lines = process.stdout.splitlines()
+            for line in lines:
+                if line.startswith("Realm"):
+                    realm_name = line.split(":")[1].strip()
+                    return realm_name

@@ -7,8 +7,7 @@ def get_returncode(process):
     return False
 
 def discover():
-    process = subprocess.run(["net", "ads", "info"])
-    get_returncode(process)
+    return subprocess.run(["net", "ads", "info"], capture_output=True, text=True)
 
 def join(user, password, ouaddress):
     """ouaddress.split("cn")[-1]
@@ -19,8 +18,7 @@ def leave(user, password):
     return subprocess.run(["net", "ads", "leave", "-U", user], input=password, text=True, capture_output=True)
 
 def domain_info():
-    process = subprocess.run(["net", "ads", "testjoin"], capture_output=True)
-    return get_returncode(process)
+    return subprocess.run(["net", "ads", "testjoin"], capture_output=True)
 
 def list_users():
     # subprocess.run(["net", "ads", "user"])
