@@ -139,7 +139,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings)
                 "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
             }
             restore_config_file(restore_files)
-            config_manager.restore_hostname()
+            fail_and_exit("This computer cannot be joined to the domain!")
 
     except subprocess.CalledProcessError as e:
         print(_("Error while joining domain. Exit Code:"), e.stderr)
@@ -149,7 +149,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings)
             "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
         }
         restore_config_file(restore_files)
-        config_manager.restore_hostname()
+        fail_and_exit("Error while joining domain.")
     except Exception as e:
         print("Error: ", e)
         restore_files = {
@@ -158,8 +158,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings)
             "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
         }
         restore_config_file(restore_files)
-        config_manager.restore_hostname()
-
+        fail_and_exit(f"Error: {e}")
 
 def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
     if not os.path.isfile("/etc/krb5.conf"):
@@ -222,7 +221,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
                     "/etc/hosts.old": "/etc/hosts"
                 }
                 restore_config_file(restore_files)
-                config_manager.restore_hostname()
+                fail_and_exit("This computer cannot be joined to the domain!")
     except subprocess.CalledProcessError as e:
         print(_("Error while joining domain. Exit Code:"), e.stderr)
         restore_files = {
@@ -232,9 +231,17 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
             "/etc/hosts.old": "/etc/hosts"
         }
         restore_config_file(restore_files)
-        config_manager.restore_hostname()
+        fail_and_exit(f"Error while joining domain. Exit Code: {e.stderr}")
     except Exception as e:
         print("Error: ", e)
+        restore_files = {
+            "/etc/krb5.conf.old": "/etc/krb5.conf",
+            "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
+            "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
+            "/etc/hosts.old": "/etc/hosts"
+        }
+        restore_config_file(restore_files)
+        fail_and_exit(f"Error: {e}")
 
 
 def join(
