@@ -89,6 +89,13 @@ def restore_config_file(restore_files):
         if os.path.exists(backup):
             config_manager.restore_config_file(backup, original)
 
+def check_ouaddress(ouaddress, domain):
+    if ouaddress is None:
+        fulldn = ", dc=" + domain.replace(".",", dc=")
+        ouaddress = "cn=Computers" + fulldn
+        return ouaddress
+    return ouaddress
+
 def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings):
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
@@ -245,9 +252,10 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
 
 
 def join(
-    comp_name, domain, user, passwd, ouaddress, smb_settings, realmd=None, winbind=None
+    comp_name, domain, user, passwd, ouaddress=None, smb_settings=False, realmd=None, winbind=None
 ):
     try:
+        ouaddress = check_ouaddress(ouaddress, domain)
         if realmd:
             # required packages
             sssd_pkg_list = [
