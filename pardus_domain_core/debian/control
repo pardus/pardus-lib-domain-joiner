@@ -11,9 +11,10 @@ Architecture: all
 Depends: python3 (>=3.5),
          python3-apt,
          krb5-user, 
-	 samba, 
-	 cifs-utils, 
-	 smbclient,
-	 python3-ldap
+         samba, 
+         cifs-utils, 
+         smbclient,
+         python3-ldap,
+         realmd
 Description: Pardus Domain Settings 
   This application is a library for ui/cli application that joins your computer to the domain or leaves it from the domain.
