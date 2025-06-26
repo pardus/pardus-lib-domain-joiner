@@ -49,6 +49,8 @@ def restore_config_file(backup_file, source_file):
 def update_hostname_file(comp_name, domain):
     # to check file /etc/hostname
     hostname_file = "/etc/hostname"
+    hostname_file_backup = "/etc/hostname.old"
+    backup_config_file(hostname_file, hostname_file_backup)
     with open(hostname_file, "r") as file:
         current_hostname = file.readline().strip()
         print(_("Checking /etc/hostname file..."))
@@ -91,8 +93,7 @@ def update_hosts_file(comp_name, domain):
         print(_("Added domain name to /etc/hosts file"))
 
 
-def rewrite_conf(file, backup_file, settings):
-    backup_config_file(file, backup_file)
+def rewrite_conf(file, settings):
     config = configparser.RawConfigParser()
     config.optionxform = str  # This prevents it from converting keys to lowercase
 
@@ -112,6 +113,7 @@ def rewrite_conf(file, backup_file, settings):
 def update_samba_conf_for_sssd(domain):
     smb_file = "/etc/samba/smb.conf"
     smb_file_backup = "/etc/samba/smb.conf.old"
+    backup_config_file(smb_file,smb_file_backup)
     samba_settings = {
         "global": {
             "unix charset": "UTF-8",
@@ -129,13 +131,12 @@ def update_samba_conf_for_sssd(domain):
         },
     }
     print(_("Updating /etc/samba/smb.conf file..."))
-    rewrite_conf(smb_file, smb_file_backup, samba_settings)
+    rewrite_conf(smb_file, samba_settings)
     print(_("Updated /etc/samba/smb.conf file..."))
 
 
 def update_sssd_conf(domain):
     sssd_file = "/etc/sssd/sssd.conf"
-    sssd_file_backup = "/etc/sssd/sssd.conf.old"
     sssd_settings = {
         "sssd": {
             "domains": domain,
@@ -159,7 +160,7 @@ def update_sssd_conf(domain):
         },
     }
     print(_("Updating /etc/sssd/sssd.conf file..."))
-    rewrite_conf(sssd_file, sssd_file_backup, sssd_settings)
+    rewrite_conf(sssd_file, sssd_settings)
     os.chmod(sssd_file, 600)
     subprocess.call(["systemctl", "restart ", "sssd"])
     print(_("Updated /etc/sssd/sssd.conf file..."))
@@ -168,6 +169,7 @@ def update_sssd_conf(domain):
 def update_samba_conf_for_winbind(domain):
     smb_file = "/etc/samba/smb.conf"
     smb_file_backup = "/etc/samba/smb.conf.old"
+    backup_config_file(smb_file,smb_file_backup)
     samba_settings = {
         "global": {
             "realm" : domain,
@@ -197,7 +199,7 @@ def update_samba_conf_for_winbind(domain):
         },
     }
     print(_("Updating /etc/samba/smb.conf file for winbind..."))
-    rewrite_conf(smb_file, smb_file_backup, samba_settings)
+    rewrite_conf(smb_file, samba_settings)
     print(_("Updated /etc/samba/smb.conf file for winbind..."))
 
 

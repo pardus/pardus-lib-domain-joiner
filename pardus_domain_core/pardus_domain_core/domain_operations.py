@@ -71,12 +71,12 @@ def discover_domain(domain):
     error = result.stderr
 
     if "can't find" in output or "non-existent domain" in output:
-        print("Domain name not found!")
+        print(_("Domain name not found!"))
     elif result.returncode != 0:
-        print("An error occured: ", error)
+        print(_(f"An error occured: {error}"))
     else:
-        print("Domain discovered:\n", output.strip().split("\n"))
-
+        domain_output = output.strip().split("\n")
+        print(_(f"Domain discovered:\n{domain_output}"))
 
 def fail_and_exit(msg):
     print(_(msg), file=sys.stdout)
@@ -113,9 +113,14 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings)
     try:
         # print("domain:", domain)
         print(_("Joining the domain..."))
+
+        # If there is a sssd file, take a backup.
+        sssd_file = "/etc/sssd/sssd.conf"
+        sssd_file_backup = "/etc/sssd/sssd.conf.old"
+        config_manager.backup_config_file(sssd_file, sssd_file_backup)
+
         messages = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
         client = f"{user}@{domain.upper()}"
-
 
         if "Preauthentication failed" in messages:
             fail_and_exit("Preauthentication failed!")
@@ -160,7 +165,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings)
         restore_config_file(restore_files)
         fail_and_exit("Error while joining domain.")
     except Exception as e:
-        print("Error: ", e)
+        print(_(f"Error: {e}"))
         restore_files = {
             "/etc/hosts.old": "/etc/hosts",
             "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
@@ -199,7 +204,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
         config_manager.update_hostname_file(comp_name, domain)
         config_manager.update_hosts_file(comp_name, domain)
         msg = domain_joiner_winbind.join(user, passwd, ouaddress)
-        print("msg: ", msg)
+        # print("msg: ", msg)
 
         messages = msg.stdout.split("\n")[-2]
 
@@ -242,7 +247,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
         restore_config_file(restore_files)
         fail_and_exit(f"Error while joining domain. Exit Code: {e.stderr}")
     except Exception as e:
-        print("Error: ", e)
+        print(_(f"Error: {e}"))
         restore_files = {
             "/etc/krb5.conf.old": "/etc/krb5.conf",
             "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
@@ -287,11 +292,7 @@ def join(
 
             handle_winbind_join(comp_name, domain, user, passwd, ouaddress)
         else:
-            print(
-                _(
-                    "No domain join method selected. Please specify either realmd or winbind."
-                )
-            )
+            print(_("No domain join method selected. Please specify either realmd or winbind."))
             sys.exit(1)
 
     except subprocess.CalledProcessError as e:
@@ -303,6 +304,7 @@ def leave(realmd=None, winbind=None, user=None, password=None):
         domain_joiner_realmd.leave()
         restore_files = {
             "/etc/hosts.old": "/etc/hosts",
+            "/etc/hostname.old": "/etc/hostname",
             "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
             "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
         }
