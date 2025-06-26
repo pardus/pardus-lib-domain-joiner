@@ -146,14 +146,14 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings)
 
             print(_("This computer has been successfully added to the domain."))
         else:
-            print(_("This computer cannot be joined to the domain!"))
+            print(_("This computer could not be joined to the domain!"))
             restore_files = {
                 "/etc/hosts.old": "/etc/hosts",
                 "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
                 "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
             }
             restore_config_file(restore_files)
-            fail_and_exit("This computer cannot be joined to the domain!")
+            fail_and_exit("This computer could not be joined to the domain!")
 
     except subprocess.CalledProcessError as e:
         print(_("Error while joining domain. Exit Code:"), e.stderr)
@@ -227,7 +227,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
             if result:
                 print(_("This computer has been successfully added to the domain."))
             else:
-                print(_("This computer cannot be joined to the domain!"))
+                print(_("This computer could not be joined to the domain!"))
                 restore_files = {
                     "/etc/krb5.conf.old": "/etc/krb5.conf",
                     "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
@@ -235,7 +235,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
                     "/etc/hosts.old": "/etc/hosts"
                 }
                 restore_config_file(restore_files)
-                fail_and_exit("This computer cannot be joined to the domain!")
+                fail_and_exit("This computer could not be joined to the domain!")
     except subprocess.CalledProcessError as e:
         print(_("Error while joining domain. Exit Code:"), e.stderr)
         restore_files = {
