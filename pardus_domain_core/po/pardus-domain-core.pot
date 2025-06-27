@@ -1,0 +1,228 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-06-26 15:04+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: pardus_domain_core/domain_operations.py:45
+msgid "{} is not installed."
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:48
+msgid "{} is installed."
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:51
+msgid "Required packages are installing."
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:60
+msgid "{} is now installed."
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:62
+msgid "{} failed to installed."
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:64
+msgid "All required packages are already installed."
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:74
+msgid "Domain name not found!"
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:76
+#, python-brace-format
+msgid "An error occured: {error}"
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:79
+#, python-brace-format
+msgid ""
+"Domain discovered:\n"
+"{domain_output}"
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:108
+#: pardus_domain_core/domain_operations.py:190
+msgid "Domain discovered..."
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:110
+#: pardus_domain_core/domain_operations.py:192
+msgid "Error discovering domain. Exit Code:"
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:115
+msgid "Joining the domain..."
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:147
+#: pardus_domain_core/domain_operations.py:228
+msgid "This computer has been successfully added to the domain."
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:149
+#: pardus_domain_core/domain_operations.py:230
+msgid "This computer could not be joined to the domain!"
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:159
+#: pardus_domain_core/domain_operations.py:240
+msgid "Error while joining domain. Exit Code:"
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:168
+#: pardus_domain_core/domain_operations.py:250
+#, python-brace-format
+msgid "Error: {e}"
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:182
+msgid "Updating /etc/krb5.conf file..."
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:184
+msgid "Updated /etc/krb5.conf file..."
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:295
+msgid ""
+"No domain join method selected. Please specify either realmd or winbind."
+msgstr ""
+
+#: pardus_domain_core/domain_operations.py:299
+msgid "An error occurred during the join process:"
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:12
+msgid "Changed hostname: "
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:20
+msgid "Restored hostname: "
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:22
+msgid "Failed the restore hostname."
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:42
+#, python-brace-format
+msgid "{source_file} has been restored from backup."
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:44
+#, python-brace-format
+msgid "An error occurred while restoring {source_file}. Error: {e}"
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:46
+#, python-brace-format
+msgid "There is no such file: {backup_file}."
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:56
+msgid "Checking /etc/hostname file..."
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:58
+msgid "Added domain name to /etc/hostname file"
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:63
+#: pardus_domain_core/config_manager.py:91
+msgid "Done"
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:73
+msgid "Checking /etc/hosts file..."
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:93
+msgid "Added domain name to /etc/hosts file"
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:133
+msgid "Updating /etc/samba/smb.conf file..."
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:135
+msgid "Updated /etc/samba/smb.conf file..."
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:162
+msgid "Updating /etc/sssd/sssd.conf file..."
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:166
+msgid "Updated /etc/sssd/sssd.conf file..."
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:201
+msgid "Updating /etc/samba/smb.conf file for winbind..."
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:203
+msgid "Updated /etc/samba/smb.conf file for winbind..."
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:236
+msgid "Updating /etc/nsswitch.conf file for winbind..."
+msgstr ""
+
+#: pardus_domain_core/config_manager.py:239
+msgid "Updated /etc/nsswitch.conf file for winbind..."
+msgstr ""
+
+#: pardus_domain_core/domain_joiner_ldap.py:21
+#, python-brace-format
+msgid "Failed to initialize LDAP connection: {e}"
+msgstr ""
+
+#: pardus_domain_core/domain_joiner_ldap.py:31
+msgid "LDAP authentication successful!"
+msgstr ""
+
+#: pardus_domain_core/domain_joiner_ldap.py:34
+#, python-brace-format
+msgid "LDAP error: {e}"
+msgstr ""
+
+#: pardus_domain_core/domain_joiner_ldap.py:37
+#, python-brace-format
+msgid "An error occurred: {e}"
+msgstr ""
+
+#: pardus_domain_core/domain_joiner_ldap.py:55
+#, python-brace-format
+msgid "Hostname {hostname} already exists in Active Directory!"
+msgstr ""
+
+#: pardus_domain_core/domain_joiner_ldap.py:60
+#, python-brace-format
+msgid "Hostname {hostname} is available to use."
+msgstr ""
+
+#: pardus_domain_core/domain_joiner_ldap.py:63
+#, python-brace-format
+msgid "LDAP search failed: {e}"
+msgstr ""
+
+#: pardus_domain_core/domain_joiner_ldap.py:77
+msgid "Connection closed."
+msgstr ""

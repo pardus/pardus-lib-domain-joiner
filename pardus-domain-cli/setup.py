@@ -2,8 +2,22 @@
 # -*- coding: utf-8 -*-
 
 import os
+import subprocess
 
 from setuptools import setup, find_packages
+
+def create_mo_files():
+    podir = "po"
+    mo = []
+    for po in os.listdir(podir):
+        if po.endswith(".po"):
+            os.makedirs("{}/{}/LC_MESSAGES".format(podir, po.split(".po")[0]), exist_ok=True)
+            mo_file = "{}/{}/LC_MESSAGES/{}".format(podir, po.split(".po")[0], "pardus-domain-cli.mo")
+            msgfmt_cmd = 'msgfmt {} -o {}'.format(podir + "/" + po, mo_file)
+            subprocess.call(msgfmt_cmd, shell=True)
+            mo.append(("/usr/share/locale/" + po.split(".po")[0] + "/LC_MESSAGES",
+                       ["po/" + po.split(".po")[0] + "/LC_MESSAGES/pardus-domain-cli.mo"]))
+    return mo
 
 changelog = "debian/changelog"
 if os.path.exists(changelog):
@@ -24,7 +38,7 @@ data_files = [
         ["src/Main.py", "src/__version__"],
     ),
     ("/usr/bin/", ["pardus-domain-cli"]),
-]
+] + create_mo_files()
 
 setup(
     name="pardus-domain-cli",

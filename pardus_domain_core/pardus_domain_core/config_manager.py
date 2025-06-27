@@ -39,11 +39,11 @@ def restore_config_file(backup_file, source_file):
     if os.path.exists(source_file):
         try:
             shutil.copy2(backup_file, source_file)
-            print(f"{source_file} has been restored from backup.")
+            print(_(f"{source_file} has been restored from backup."))
         except Exception as e:
-            print(f"An error occurred while restoring {source_file}. Error: {e}")
+            print(_(f"An error occurred while restoring {source_file}. Error: {e}"))
     else:
-        print(f"There is no such file: {backup_file}.")
+        print(_(f"There is no such file: {backup_file}."))
 
 
 def update_hostname_file(comp_name, domain):
