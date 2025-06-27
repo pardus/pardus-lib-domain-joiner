@@ -121,7 +121,7 @@ def main():
         sys.exit(1)
 
 def check_args(domain, comp_name, username, password):
-    if domain is None or comp_name is None or username is None or password is None:
+    if (domain is None or comp_name is None or username is None) and password is None:
         print(_("Error: The following arguments are required!"))
         print(_("Please enter other commands:\n"), 
             ("\t\t [-d/--domain DOMAIN] [-c/--computer-namse COMPUTER]\n"),
