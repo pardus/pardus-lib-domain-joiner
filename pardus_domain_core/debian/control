@@ -2,7 +2,7 @@ Source: pardus-domain-core
 Section: utils
 Priority: optional
 Maintainer: Pardus Altyapı <altyapi@pardus.org.tr>
-Build-Depends: debhelper (>= 10), dh-python, python3-all, python3-setuptools, libldap2-dev, libsasl2-dev, python3-dev
+Build-Depends: debhelper (>= 10), dh-python, python3-all, python3-setuptools, python3-dev
 Standards-Version: 4.6.1
 Homepage: https://www.pardus.org.tr
 
@@ -10,6 +10,8 @@ Package: pardus-domain-core
 Architecture: all
 Depends: python3 (>=3.5),
          python3-apt,
+         libldap2-dev,
+         libsasl2-dev,
          krb5-user, 
          samba, 
          cifs-utils, 
