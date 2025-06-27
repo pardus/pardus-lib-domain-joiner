@@ -9,6 +9,8 @@ from locale import gettext as _
 locale.bindtextdomain('pardus_domain_core', '/usr/share/locale')
 locale.textdomain('pardus_domain_core')
 
+SYSTEM_LANGUAGE = os.environ.get("LANG")
+locale.setlocale(locale.LC_ALL, SYSTEM_LANGUAGE)
 
 def set_hostname(comp_name):
     backup_config_file("/etc/hostname", "/etc/hostname.old")

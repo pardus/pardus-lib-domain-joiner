@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-27 10:20+0300\n"
+"POT-Creation-Date: 2025-06-27 11:46+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,124 +17,124 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Main.py:22
+#: src/Main.py:25
 msgid "Cli application for pardus domain joiner. You must run it with sudo"
 msgstr ""
 
-#: src/Main.py:24
+#: src/Main.py:27
 msgid "Use sssd service for domain operations"
 msgstr ""
 
-#: src/Main.py:25
+#: src/Main.py:28
 msgid "Use winbind service for domain operations"
 msgstr ""
 
-#: src/Main.py:26
+#: src/Main.py:29
 msgid "Discover domain name"
 msgstr ""
 
-#: src/Main.py:27
+#: src/Main.py:30
 msgid "Change hostname"
 msgstr ""
 
-#: src/Main.py:29
+#: src/Main.py:32
 msgid "Join to the domain"
 msgstr ""
 
-#: src/Main.py:30
+#: src/Main.py:33
 msgid "Leave from the domain"
 msgstr ""
 
-#: src/Main.py:31
+#: src/Main.py:34
 msgid "Check if it is in the domain"
 msgstr ""
 
-#: src/Main.py:32
+#: src/Main.py:35
 msgid "Discover if there is a domain name"
 msgstr ""
 
-#: src/Main.py:33 src/Main.py:34
+#: src/Main.py:36 src/Main.py:37
 msgid "For sssd service"
 msgstr ""
 
-#: src/Main.py:35 src/Main.py:36
+#: src/Main.py:38 src/Main.py:39
 msgid "For winbind service"
 msgstr ""
 
-#: src/Main.py:38
+#: src/Main.py:41
 msgid "Domain name"
 msgstr ""
 
-#: src/Main.py:39
+#: src/Main.py:42
 msgid "Domain username"
 msgstr ""
 
-#: src/Main.py:40
+#: src/Main.py:43
 msgid "Domain user's password"
 msgstr ""
 
-#: src/Main.py:41
+#: src/Main.py:44
 msgid "Computer name"
 msgstr ""
 
-#: src/Main.py:42
+#: src/Main.py:45
 msgid "Organizational unit"
 msgstr ""
 
-#: src/Main.py:43
+#: src/Main.py:46
 msgid "Configuring samba settings for sssd service. Type 'True' or 'False'"
 msgstr ""
 
-#: src/Main.py:56
+#: src/Main.py:59
 msgid "You have selected the sssd service."
 msgstr ""
 
-#: src/Main.py:58 src/Main.py:81
+#: src/Main.py:61 src/Main.py:84
 msgid "Join process is starting."
 msgstr ""
 
-#: src/Main.py:62 src/Main.py:85
+#: src/Main.py:65 src/Main.py:88
 msgid "Leave process is starting."
 msgstr ""
 
-#: src/Main.py:68 src/Main.py:105
+#: src/Main.py:71 src/Main.py:108
 msgid "Please enter domain name!"
 msgstr ""
 
-#: src/Main.py:77 src/Main.py:101
+#: src/Main.py:80 src/Main.py:104
 msgid "Select the action you want to perform!"
 msgstr ""
 
-#: src/Main.py:79
+#: src/Main.py:82
 msgid "You have selected the winbind service."
 msgstr ""
 
-#: src/Main.py:87
+#: src/Main.py:90
 msgid "Please enter username and password!"
 msgstr ""
 
-#: src/Main.py:103
+#: src/Main.py:106
 msgid "Domain name is being checked."
 msgstr ""
 
-#: src/Main.py:109
+#: src/Main.py:112
 msgid "Hostname is being changed."
 msgstr ""
 
-#: src/Main.py:111
+#: src/Main.py:114
 msgid "Please enter computer name and domain name!"
 msgstr ""
 
-#: src/Main.py:117
+#: src/Main.py:120
 msgid ""
 "Please specify which service to use: sssd or winbind.\n"
 "You can use the -i option to view domain information."
 msgstr ""
 
-#: src/Main.py:122
+#: src/Main.py:125
 msgid "Error: The following arguments are required!"
 msgstr ""
 
-#: src/Main.py:123
+#: src/Main.py:126
 msgid "Please enter other commands:\n"
 msgstr ""

@@ -17,6 +17,9 @@ from locale import gettext as _
 locale.bindtextdomain('pardus-domain-cli', '/usr/share/locale')
 locale.textdomain('pardus-domain-cli')
 
+SYSTEM_LANGUAGE = os.environ.get("LANG")
+locale.setlocale(locale.LC_ALL, SYSTEM_LANGUAGE)
+
 
 def main():
     parser = argparse.ArgumentParser(description=_("Cli application for pardus domain joiner. You must run it with sudo"))
