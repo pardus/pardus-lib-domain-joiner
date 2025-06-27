@@ -2,7 +2,11 @@
 
 """
 import ldap
+import locale
 from locale import gettext as _
+
+locale.bindtextdomain('pardus_domain_core', '/usr/share/locale')
+locale.textdomain('pardus_domain_core')
 
 class LDAP:
     def __init__(self, address, username, password):

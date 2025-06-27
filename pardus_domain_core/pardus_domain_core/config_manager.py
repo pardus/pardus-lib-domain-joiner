@@ -3,7 +3,11 @@ import os
 import shutil
 import subprocess
 
+import locale
 from locale import gettext as _
+
+locale.bindtextdomain('pardus_domain_core', '/usr/share/locale')
+locale.textdomain('pardus_domain_core')
 
 
 def set_hostname(comp_name):

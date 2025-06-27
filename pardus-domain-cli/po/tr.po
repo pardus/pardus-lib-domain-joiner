@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pardus-domain-cli\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-26 14:34+0300\n"
+"POT-Creation-Date: 2025-06-27 10:20+0300\n"
 "PO-Revision-Date: 2025-06-26 15:34+0300\n"
 "Last-Translator: busra.cagliyan <busra.cagliyan@pardus.org.tr>\n"
 "Language-Team: Turkish <dev@pardus.org.tr>\n"
@@ -19,115 +19,118 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Poedit 3.2.2\n"
 
-#: src/Main.py:18
+#: src/Main.py:22
 msgid "Cli application for pardus domain joiner. You must run it with sudo"
-msgstr "Pardus domain joiner için Cli uygulaması. Bunu sudo ile çalıştırmanız gerekiyor"
+msgstr ""
+"Pardus domain joiner için Cli uygulaması. Bunu sudo ile çalıştırmanız "
+"gerekiyor"
 
-#: src/Main.py:20
+#: src/Main.py:24
 msgid "Use sssd service for domain operations"
 msgstr "Etki alanı işlemleri için sssd servisini kullanın"
 
-#: src/Main.py:21
+#: src/Main.py:25
 msgid "Use winbind service for domain operations"
 msgstr "Etki alanı işlemleri için winbind servisini kullanın"
 
-#: src/Main.py:22
+#: src/Main.py:26
 msgid "Discover domain name"
 msgstr "Alan adını keşfedin"
 
-#: src/Main.py:23
+#: src/Main.py:27
 msgid "Change hostname"
 msgstr "Ana bilgisayar adını değiştirin"
 
-#: src/Main.py:25
+#: src/Main.py:29
 msgid "Join to the domain"
 msgstr "Etki alanına dahil edin"
 
-#: src/Main.py:26
+#: src/Main.py:30
 msgid "Leave from the domain"
 msgstr "Etki alanından ayrılın"
 
-#: src/Main.py:27
+#: src/Main.py:31
 msgid "Check if it is in the domain"
 msgstr "Etki alanında olup olmadığını kontrol edin"
 
-#: src/Main.py:28
+#: src/Main.py:32
 msgid "Discover if there is a domain name"
 msgstr "Bir alan adı olup olmadığını keşfedin"
 
-#: src/Main.py:29 src/Main.py:30
+#: src/Main.py:33 src/Main.py:34
 msgid "For sssd service"
 msgstr "Sssd servisi için"
 
-#: src/Main.py:31 src/Main.py:32
+#: src/Main.py:35 src/Main.py:36
 msgid "For winbind service"
 msgstr "Winbind servisi için"
 
-#: src/Main.py:34
+#: src/Main.py:38
 msgid "Domain name"
 msgstr "Etki alanı adı"
 
-#: src/Main.py:35
+#: src/Main.py:39
 msgid "Domain username"
 msgstr "Etki alanı kullanıcı adı"
 
-#: src/Main.py:36
+#: src/Main.py:40
 msgid "Domain user's password"
 msgstr "Etki alanı kullanıcısının parolası"
 
-#: src/Main.py:37
+#: src/Main.py:41
 msgid "Computer name"
 msgstr "Bilgisayar adı"
 
-#: src/Main.py:38
+#: src/Main.py:42
 msgid "Organizational unit"
 msgstr "Organizasyonel birim"
 
-#: src/Main.py:39
+#: src/Main.py:43
 msgid "Configuring samba settings for sssd service. Type 'True' or 'False'"
-msgstr "Sssd servisi için samba ayarlarını yapılandırma. 'True' veya 'False' yazın"
+msgstr ""
+"Sssd servisi için samba ayarlarını yapılandırma. 'True' veya 'False' yazın"
 
-#: src/Main.py:52
+#: src/Main.py:56
 msgid "You have selected the sssd service."
 msgstr "Sssd servisini seçtiniz."
 
-#: src/Main.py:54 src/Main.py:77
+#: src/Main.py:58 src/Main.py:81
 msgid "Join process is starting."
 msgstr "Dahil edilme işlemi başlatıldı."
 
-#: src/Main.py:58 src/Main.py:81
+#: src/Main.py:62 src/Main.py:85
 msgid "Leave process is starting."
 msgstr "Ayrılma işlemi başlatıldı."
 
-#: src/Main.py:64 src/Main.py:101
+#: src/Main.py:68 src/Main.py:105
 msgid "Please enter domain name!"
 msgstr "Lütfen alan adını giriniz!"
 
-#: src/Main.py:73 src/Main.py:97
+#: src/Main.py:77 src/Main.py:101
 msgid "Select the action you want to perform!"
 msgstr "Gerçekleştirmek istediğiniz eylemi seçin!"
 
-#: src/Main.py:75
+#: src/Main.py:79
 msgid "You have selected the winbind service."
 msgstr "Winbind servisini seçtiniz."
 
-#: src/Main.py:83
+#: src/Main.py:87
 msgid "Please enter username and password!"
 msgstr "Parolayı ve kullanıcı adını giriniz!"
 
-#: src/Main.py:99
+#: src/Main.py:103
 msgid "Domain name is being checked."
 msgstr "Etki alanı adı kontrol ediliyor."
 
-#: src/Main.py:105
+#: src/Main.py:109
 msgid "Hostname is being changed."
 msgstr "Ana bilgisayar adı değiştirildi."
 
-#: src/Main.py:107
+#: src/Main.py:111
 msgid "Please enter computer name and domain name!"
 msgstr "Lütfen bilgisayar adını ve alan adını giriniz!"
 
-#: src/Main.py:113
+#: src/Main.py:117
 msgid ""
 "Please specify which service to use: sssd or winbind.\n"
 "You can use the -i option to view domain information."
@@ -135,10 +138,10 @@ msgstr ""
 "Lütfen hangi servisi kullanacağınızı belirtin: sssd veya winbind.\n"
 "Alan bilgilerini görüntülemek için -i seçeneğini kullanabilirsiniz."
 
-#: src/Main.py:118
+#: src/Main.py:122
 msgid "Error: The following arguments are required!"
 msgstr "Hata: Aşağıdaki argümanlar gerekmektedir!"
 
-#: src/Main.py:119
+#: src/Main.py:123
 msgid "Please enter other commands:\n"
 msgstr "Lütfen diğer komutları girin:\n"

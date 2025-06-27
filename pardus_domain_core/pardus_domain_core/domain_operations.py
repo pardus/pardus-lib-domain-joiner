@@ -8,8 +8,11 @@ from pardus_domain_core import domain_joiner_winbind
 from pardus_domain_core import config_manager
 from pardus_domain_core import update_krb5_config
 
+import locale
 from locale import gettext as _
 
+locale.bindtextdomain('pardus_domain_core', '/usr/share/locale')
+locale.textdomain('pardus_domain_core')
 
 def isinstalled(packagename):
     try:

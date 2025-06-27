@@ -11,7 +11,11 @@ from pardus_domain_core import config_manager
 from pardus_domain_core import domain_joiner_realmd
 from pardus_domain_core import domain_joiner_winbind
 
+import locale
 from locale import gettext as _
+
+locale.bindtextdomain('pardus-domain-cli', '/usr/share/locale')
+locale.textdomain('pardus-domain-cli')
 
 
 def main():
