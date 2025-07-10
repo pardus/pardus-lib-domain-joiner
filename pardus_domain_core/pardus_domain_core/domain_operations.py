@@ -81,7 +81,7 @@ def discover_domain(domain):
     elif result.returncode != 0:
         print(_(f"An error occured: {error}"))
     else:
-        domain_output = output.strip().split("\n")
+        domain_output = output.strip()
         print(_(f"Domain discovered:\n{domain_output}"))
 
 def fail_and_exit(msg):
