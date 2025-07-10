@@ -27,6 +27,18 @@ def restore_hostname():
     else:
         print(_("Failed the restore hostname."))
 
+def start_sssd_service():
+    subprocess.call(["systemctl","stop","winbind.service"])
+    subprocess.call(["systemctl","disable","winbind.service"])
+    subprocess.call(["systemctl","start","sssd.service"])
+    subprocess.call(["systemctl","enable","sssd.service"])
+
+def start_winbind_service():
+    subprocess.call(["systemctl","stop","sssd.service"])
+    subprocess.call(["systemctl","disable","sssd.service"])
+    subprocess.call(["systemctl","start","winbind.service"])
+    subprocess.call(["systemctl","enable","winbind.service"])
+
 
 # backup config files before editing them
 def backup_config_file(source_file, backup_file):

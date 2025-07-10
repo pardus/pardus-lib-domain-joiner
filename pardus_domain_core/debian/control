@@ -17,6 +17,14 @@ Depends: python3 (>=3.5),
          cifs-utils, 
          smbclient,
          python3-ldap,
-         realmd
+         realmd,
+         sssd,
+         libsss-sudo,
+         sssd-tools,
+         packagekit,
+         adcli,
+         winbind,
+         libnss-winbind,
+         libpam-winbind
 Description: Pardus Domain Settings 
   This application is a library for ui/cli application that joins your computer to the domain or leaves it from the domain.

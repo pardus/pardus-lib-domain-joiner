@@ -270,6 +270,8 @@ def join(
     try:
         #ouaddress = check_ouaddress(ouaddress, domain)
         if realmd:
+            config_manager.start_sssd_service()
+            subprocess.run(["pam-auth-update", "--enable", "sss"], capture_output=True)
             # required packages
             sssd_pkg_list = [
                 "krb5-user",
@@ -283,9 +285,11 @@ def join(
                 "cifs-utils",
                 "smbclient",
             ]
-            check_and_install_packages(sssd_pkg_list)
+            # check_and_install_packages(sssd_pkg_list)
             handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings)
         elif winbind:
+            config_manager.start_winbind_service()
+            subprocess.run(["pam-auth-update", "--disable", "sss"], capture_output=True)
             winbind_pkg_list = [
                 "samba",
                 "smbclient",
@@ -294,7 +298,7 @@ def join(
                 "libnss-winbind",
                 "libpam-winbind",
             ]
-            check_and_install_packages(winbind_pkg_list)
+            #check_and_install_packages(winbind_pkg_list)
 
             handle_winbind_join(comp_name, domain, user, passwd, ouaddress)
         else:
