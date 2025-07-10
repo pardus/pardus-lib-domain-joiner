@@ -104,7 +104,7 @@ def check_ouaddress(ouaddress, domain):
     return ouaddress
 """
 
-def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings):
+def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
 
@@ -140,8 +140,8 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings)
             config_manager.update_hostname_file(comp_name, domain)
             config_manager.update_hosts_file(comp_name, domain)
 
-            if smb_settings:
-                config_manager.update_samba_conf_for_sssd(domain)
+            """if smb_settings:
+                config_manager.update_samba_conf_for_sssd(domain)"""
 
             config_manager.update_sssd_conf(domain)
 
@@ -265,7 +265,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
 
 
 def join(
-    comp_name, domain, user, passwd, ouaddress=None, smb_settings=False, realmd=None, winbind=None
+    comp_name, domain, user, passwd, ouaddress=None, realmd=None, winbind=None
 ):
     try:
         #ouaddress = check_ouaddress(ouaddress, domain)
@@ -286,7 +286,7 @@ def join(
                 "smbclient",
             ]
             # check_and_install_packages(sssd_pkg_list)
-            handle_realmd_join(comp_name, domain, user, passwd, ouaddress, smb_settings)
+            handle_realmd_join(comp_name, domain, user, passwd, ouaddress)
         elif winbind:
             config_manager.start_winbind_service()
             subprocess.run(["pam-auth-update", "--disable", "sss"], capture_output=True)

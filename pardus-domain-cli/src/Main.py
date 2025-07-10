@@ -43,8 +43,6 @@ def main():
     parser.add_argument("-p", "--password", help=_("Domain user's password"))
     parser.add_argument("-c", "--computer-name", help=_("Computer name"))
     parser.add_argument("-ou", "--organizational-unit", help=_("Organizational unit"))
-    parser.add_argument("-ss", "--samba-settings", help=_("Configuring samba settings for sssd service. Type 'True' or 'False'"))
-
 
     args = parser.parse_args()
 
@@ -53,14 +51,13 @@ def main():
     username = args.user
     password = args.password
     ouaddress = args.organizational_unit
-    samba_settings = args.samba_settings
 
     if args.sssd:
         print(_("You have selected the sssd service."))
         if args.join:
             print(_("Join process is starting."))
             check_args(domain, comp_name, username, password)
-            domain_operations.join(comp_name, domain, username, password, ouaddress, samba_settings, realmd=True)
+            domain_operations.join(comp_name, domain, username, password, ouaddress, realmd=True)
         elif args.leave:
             print(_("Leave process is starting."))
             domain_operations.leave(realmd=True)
@@ -83,7 +80,7 @@ def main():
         if args.join:
             print(_("Join process is starting."))
             check_args(domain, comp_name, username, password)
-            domain_operations.join(comp_name, domain, username, password, ouaddress, samba_settings, winbind=True)
+            domain_operations.join(comp_name, domain, username, password, ouaddress, winbind=True)
         elif args.leave:
             print(_("Leave process is starting."))
             if username is None or password is None:
