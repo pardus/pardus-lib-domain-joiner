@@ -78,8 +78,10 @@ def discover_domain(domain):
 
     if "can't find" in output or "non-existent domain" in output:
         print(_("Domain name not found!"))
+        sys.exit(1)
     elif result.returncode != 0:
         print(_(f"An error occured: {error}"))
+        sys.exit(1)
     else:
         domain_output = output.strip()
         print(_(f"Domain discovered:\n{domain_output}"))
@@ -181,6 +183,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         fail_and_exit(f"Error: {e}")
 
 def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
+    discover_domain(domain)
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
 
@@ -217,6 +220,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
         if "a bad username or authentication information" in messages:
             restore_files = {
                 "/etc/hosts.old": "/etc/hosts",
+                "/etc/hostname.old": "/etc/hostname",
                 "/etc/krb5.conf.old": "/etc/krb5.conf",
                 "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
                 "/etc/nsswitch.conf.old": "/etc/nsswitch.conf"
@@ -238,7 +242,8 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
                     "/etc/krb5.conf.old": "/etc/krb5.conf",
                     "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
                     "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
-                    "/etc/hosts.old": "/etc/hosts"
+                    "/etc/hosts.old": "/etc/hosts",
+                    "/etc/hostname.old": "/etc/hostname"
                 }
                 restore_config_file(restore_files)
                 fail_and_exit("This computer could not be joined to the domain!")
@@ -248,7 +253,8 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
             "/etc/krb5.conf.old": "/etc/krb5.conf",
             "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
             "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
-            "/etc/hosts.old": "/etc/hosts"
+            "/etc/hosts.old": "/etc/hosts",
+            "/etc/hostname.old": "/etc/hostname"
         }
         restore_config_file(restore_files)
         fail_and_exit(f"Error while joining domain. Exit Code: {e.stderr}")
