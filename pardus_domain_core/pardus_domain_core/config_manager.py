@@ -13,6 +13,8 @@ SYSTEM_LANGUAGE = os.environ.get("LANG")
 locale.setlocale(locale.LC_ALL, SYSTEM_LANGUAGE)
 
 def set_hostname(comp_name):
+    backup_config_file("/etc/hosts", "/etc/hosts.old")
+    update_hosts_file(comp_name)
     backup_config_file("/etc/hostname", "/etc/hostname.old")
     subprocess.call(["hostnamectl", "hostname", comp_name])
     print(_("Changed hostname: "), comp_name)
@@ -20,12 +22,13 @@ def set_hostname(comp_name):
 
 def restore_hostname():
     if os.path.isfile("/etc/hostname.old"):
-        with open("/etc/hostname.old") as f:
+        with open("/etc/hostname.old", "r") as f:
             comp_name = f.read()
         subprocess.call(["hostnamectl", "hostname", comp_name])
-        print(_("Restored hostname: "), comp_name)
+        print(_("Restored hostname file: "), comp_name)
+        restore_config_file("/etc/hosts.old", "/etc/hosts")
     else:
-        print(_("Failed the restore hostname."))
+        print(_("Failed the restore hostname file."))
 
 def start_sssd_service():
     subprocess.call(["systemctl","stop","winbind.service"])
@@ -80,35 +83,45 @@ def update_hostname_file(comp_name, domain):
         else:
             print(_("Done"))
 
-
-def update_hosts_file(comp_name, domain):
+def update_hosts_file(comp_name, domain=None):
     # to check file /etc/hosts
     hosts_file = "/etc/hosts"
     hosts_file_backup = "/etc/hosts.old"
+
+    if not os.path.isfile(hosts_file):
+        print("/etc/hosts not found.")
+        return False
+
     backup_config_file(hosts_file, hosts_file_backup)
+
     with open(hosts_file, "r") as file:
         lines = file.readlines()
+
     print(_("Checking /etc/hosts file..."))
+
     new_hosts_file = []
-    domain_exists = False
+    updated = False
+
+    full_hostname = f"{comp_name}.{domain}" if domain else comp_name
+    new_entry = f"127.0.1.1 {full_hostname} {comp_name}" if domain else f"127.0.1.1 {comp_name}"
 
     for line in lines:
         if line.strip().startswith("127.0.1.1"):
-            if f"{comp_name}.{domain}" not in line:
-                line = f"127.0.1.1 {comp_name}.{domain} {comp_name}\n"
-            domain_exists = True
+            if full_hostname not in line:
+                line = f"{new_entry}\n"
+            updated = True
         new_hosts_file.append(line)
 
-    if not domain_exists:
-        new_hosts_file.append(f"127.0.1.1 {comp_name}.{domain} {comp_name}\n")
+    if not updated:
+        new_hosts_file.append(f"{new_entry}\n")
 
     with open(hosts_file, "w") as file:
         file.writelines(new_hosts_file)
 
-    if domain_exists:
+    if updated:
         print(_("Done"))
     else:
-        print(_("Added domain name to /etc/hosts file"))
+        print(_("Added hostname to /etc/hosts file"))
 
 
 def rewrite_conf(file, settings):
