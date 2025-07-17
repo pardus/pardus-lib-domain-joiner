@@ -20,8 +20,8 @@ def join(domain, user, passwd, ouaddress):
 
     return msg
 
-def leave():
-    subprocess.run(["realm", "leave", "-v"], check=True)
+def leave(user, password):
+    subprocess.run(["realm", "leave", "-U", user], input=password, text=True, capture_output=True)
 
 def list_realm():
     return subprocess.run(["realm", "list"], capture_output=True)
