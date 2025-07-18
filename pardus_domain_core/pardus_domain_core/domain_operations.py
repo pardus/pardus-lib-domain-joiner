@@ -157,7 +157,6 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
             print(_("This computer could not be joined to the domain!"))
             restore_files = {
                 "/etc/hosts.old": "/etc/hosts",
-                "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
                 "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
             }
             restore_config_file(restore_files)
@@ -167,7 +166,6 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         print(_("Error while joining domain. Exit Code:"), e.stderr)
         restore_files = {
             "/etc/hosts.old": "/etc/hosts",
-            "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
             "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
         }
         restore_config_file(restore_files)
@@ -176,7 +174,6 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         print(_(f"Error: {e}"))
         restore_files = {
             "/etc/hosts.old": "/etc/hosts",
-            "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
             "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
         }
         restore_config_file(restore_files)
@@ -317,11 +314,10 @@ def join(
 
 def leave(realmd=None, winbind=None, user=None, password=None):
     if realmd:
-        domain_joiner_realmd.leave()
+        domain_joiner_realmd.leave(user, password)
         restore_files = {
             "/etc/hosts.old": "/etc/hosts",
             "/etc/hostname.old": "/etc/hostname",
-            "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
             "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
         }
         restore_config_file(restore_files)
@@ -354,3 +350,4 @@ def list(realmd=None, winbind=None):
                 if line.startswith("Realm"):
                     realm_name = line.split(":")[1].strip()
                     return realm_name
+    return ""
