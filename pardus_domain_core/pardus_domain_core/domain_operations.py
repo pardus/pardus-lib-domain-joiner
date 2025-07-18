@@ -331,6 +331,7 @@ def leave(realmd=None, winbind=None, user=None, password=None):
         domain_joiner_winbind.leave(user, password)
         restore_files = {
             "/etc/hosts.old": "/etc/hosts",
+            "/etc/hostname.old": "/etc/hostname",
             "/etc/krb5.conf.old": "/etc/krb5.conf",
             "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
             "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
