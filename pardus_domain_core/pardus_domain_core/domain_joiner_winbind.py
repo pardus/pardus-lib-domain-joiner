@@ -12,15 +12,14 @@ def discover():
 def join(user, password, ouaddress):
     join_command = ["net", "ads", "join", "-v", "-U", user]
 
-    if ouaddress:
+    """if ouaddress:
         ouaddress.split("cn")[-1]
         ou = f"'--ou={ouaddress}'"
-        join_command = ["net", "ads", "join", "-v", "-U", user, ou]
-
+        join_command = ["net", "ads", "join", "-v", "-U", user, ou]"""
     return subprocess.run(join_command, input=password, text=True, capture_output=True)
 
 def leave(user, password):
-    return subprocess.run(["net", "ads", "leave", "-U", user], input=password, text=True, capture_output=True)
+    return subprocess.run(["net", "ads", "leave", "-U", user], input=password, text=True)
 
 def domain_info():
     return subprocess.run(["net", "ads", "testjoin"], capture_output=True)

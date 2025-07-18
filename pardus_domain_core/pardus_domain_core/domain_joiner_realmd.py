@@ -21,7 +21,7 @@ def join(domain, user, passwd, ouaddress):
     return msg
 
 def leave(user, password):
-    subprocess.run(["realm", "leave", "-U", user], input=password, text=True, capture_output=True)
+    subprocess.run(["realm", "leave", "-U", user], input=password, text=True)
 
 def list_realm():
     return subprocess.run(["realm", "list"], capture_output=True)
