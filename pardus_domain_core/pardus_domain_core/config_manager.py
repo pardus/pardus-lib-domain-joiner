@@ -14,8 +14,8 @@ locale.setlocale(locale.LC_ALL, SYSTEM_LANGUAGE)
 
 def set_hostname(comp_name):
     backup_config_file("/etc/hosts", "/etc/hosts.old")
-    update_hosts_file(comp_name)
     backup_config_file("/etc/hostname", "/etc/hostname.old")
+    update_hosts_file(comp_name)
     subprocess.call(["hostnamectl", "hostname", comp_name])
     print(_("Changed hostname: "), comp_name)
 
@@ -67,18 +67,21 @@ def restore_config_file(backup_file, source_file):
         print(_(f"There is no such file: {backup_file}."))
 
 
-def update_hostname_file(comp_name, domain):
+def update_hostname_file(comp_name, domain=None):
     # to check file /etc/hostname
     hostname_file = "/etc/hostname"
     hostname_file_backup = "/etc/hostname.old"
     backup_config_file(hostname_file, hostname_file_backup)
+
+    full_hostname = f"{comp_name}.{domain}" if domain else comp_name
+
     with open(hostname_file, "r") as file:
         current_hostname = file.readline().strip()
         print(_("Checking /etc/hostname file..."))
-        if comp_name + "." + domain not in current_hostname:
+        if full_hostname not in current_hostname:
             print(_("Added domain name to /etc/hostname file"))
             with open(hostname_file, "w") as file:
-                new_hostname = "{}.{}".format(comp_name, domain)
+                new_hostname = f"{full_hostname}"
                 file.write(new_hostname)
         else:
             print(_("Done"))
