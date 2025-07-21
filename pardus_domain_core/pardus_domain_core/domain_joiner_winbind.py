@@ -1,8 +1,14 @@
 import subprocess
 
+TIMEOUT = "3"
+
 
 def discover():
-    return subprocess.run(["net", "ads", "info"], capture_output=True, text=True)
+    return subprocess.run(
+        ["timeout", TIMEOUT, "net", "ads", "info"],
+        capture_output=True,
+        text=True,
+    )
 
 
 def join(user, password, ouaddress):
@@ -24,7 +30,11 @@ def leave(user, password):
 
 
 def domain_info():
-    return subprocess.run(["net", "ads", "testjoin"], capture_output=True, text=True)
+    return subprocess.run(
+        ["timeout", TIMEOUT, "net", "ads", "testjoin"],
+        capture_output=True,
+        text=True,
+    )
 
 
 def list_users():
