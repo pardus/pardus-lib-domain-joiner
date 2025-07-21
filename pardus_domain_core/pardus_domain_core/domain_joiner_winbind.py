@@ -12,10 +12,9 @@ def discover():
 def join(user, password, ouaddress):
     join_command = ["net", "ads", "join", "-v", "-U", user]
 
-    """if ouaddress:
-        ouaddress.split("cn")[-1]
-        ou = f"'--ou={ouaddress}'"
-        join_command = ["net", "ads", "join", "-v", "-U", user, ou]"""
+    if ouaddress:
+        ou = f'createcomputer="{ouaddress}"'
+        join_command = ["net", "ads", "join", "-v", "-U", user, ou]
     return subprocess.run(join_command, input=password, text=True, capture_output=True)
 
 def leave(user, password):

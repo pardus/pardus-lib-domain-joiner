@@ -97,14 +97,14 @@ def restore_config_file(restore_files):
         if os.path.exists(backup):
             config_manager.restore_config_file(backup, original)
 
-"""
-def check_ouaddress(ouaddress, domain):
-    if ouaddress is None:
-        fulldn = ", dc=" + domain.replace(".",", dc=")
-        ouaddress = "cn=Computers" + fulldn
-        return ouaddress
-    return ouaddress
-"""
+
+def format_ou_dn(ouaddress, domain):
+    if ouaddress:
+        fulldn = ",DC=" + domain.replace(".",",DC=")
+        ou = f"OU={ouaddress}" + fulldn
+        return ou
+    return None
+
 
 def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     if not os.path.isfile("/etc/krb5.conf"):
@@ -126,6 +126,8 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         sssd_file = "/etc/sssd/sssd.conf"
         sssd_file_backup = "/etc/sssd/sssd.conf.old"
         config_manager.backup_config_file(sssd_file, sssd_file_backup)
+
+        ouaddress = format_ou_dn(ouaddress, domain)
 
         messages = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
         client = f"{user}@{domain.upper()}"

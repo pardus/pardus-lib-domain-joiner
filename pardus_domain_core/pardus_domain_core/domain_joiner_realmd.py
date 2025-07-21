@@ -8,8 +8,7 @@ def join(domain, user, passwd, ouaddress):
     join_command = ["realm", "join", "-v", "-U", user, domain.upper()]
 
     if ouaddress:
-        ou = f"--computer-ou={ouaddress}"
-        join_command = ["realm", "join", "-v", "-U", user, ou, domain.upper()]
+        join_command = ["realm", "join", "-v", "-U", user, "--computer-ou", ouaddress, domain.upper()]
 
     print(join_command)
     process = subprocess.run(
