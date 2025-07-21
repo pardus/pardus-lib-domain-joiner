@@ -1,7 +1,6 @@
 import os
 import subprocess
 import sys
-import apt
 
 from pardus_domain_core import domain_joiner_realmd
 from pardus_domain_core import domain_joiner_winbind
@@ -11,63 +10,11 @@ from pardus_domain_core import update_krb5_config
 import locale
 from locale import gettext as _
 
-locale.bindtextdomain('pardus_domain_core', '/usr/share/locale')
-locale.textdomain('pardus_domain_core')
+locale.bindtextdomain("pardus_domain_core", "/usr/share/locale")
+locale.textdomain("pardus_domain_core")
 
 SYSTEM_LANGUAGE = os.environ.get("LANG")
 locale.setlocale(locale.LC_ALL, SYSTEM_LANGUAGE)
-
-def isinstalled(packagename):
-    try:
-        cache = apt.Cache()
-        cache.open()
-        package = cache[packagename]
-    except Exception as e:
-        print("{}".format(e))
-        return False
-    return package.is_installed
-
-
-def update():
-    subprocess.call(
-        ["apt", "update", "-o", "APT::Status-Fd=2"],
-        env={**os.environ, "DEBIAN_FRONTEND": "noninteractive"},
-    )
-
-
-def install(package_list):
-    for package in package_list:
-        subprocess.call(
-            ["apt", "install", package, "-yq", "-o", "APT::Status-Fd=2"],
-            env={**os.environ, "DEBIAN_FRONTEND": "noninteractive"},
-        )
-
-
-def check_and_install_packages(package_list):
-    not_installed = []
-
-    for package in package_list:
-        if not isinstalled(package):
-            print(_("{} is not installed.").format(package))
-            not_installed.append(package)
-        else:
-            print(_("{} is installed.").format(package))
-
-    if not_installed:
-        print(_("Required packages are installing."))
-        # to update
-        update()
-        # install packages
-        install(package_list)
-
-        # re-check not installed packages
-        for ni_package in not_installed:
-            if isinstalled(ni_package):
-                print(_("{} is now installed.").format(ni_package))
-            else:
-                print(_("{} failed to installed.").format(ni_package))
-    else:
-        print(_("All required packages are already installed."))
 
 
 def discover_domain(domain):
@@ -86,6 +33,7 @@ def discover_domain(domain):
         domain_output = output.strip()
         print(_(f"Domain discovered:\n{domain_output}"))
 
+
 def fail_and_exit(msg):
     print(_(msg), file=sys.stdout)
     config_manager.restore_hostname()
@@ -100,7 +48,7 @@ def restore_config_file(restore_files):
 
 def format_ou_dn(ouaddress, domain):
     if ouaddress:
-        fulldn = ",DC=" + domain.replace(".",",DC=")
+        fulldn = ",DC=" + domain.replace(".", ",DC=")
         ou = f"OU={ouaddress}" + fulldn
         return ou
     return None
@@ -181,6 +129,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         restore_config_file(restore_files)
         fail_and_exit(f"Error: {e}")
 
+
 def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
     discover_domain(domain)
     if not os.path.isfile("/etc/krb5.conf"):
@@ -200,11 +149,11 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
             print(_("Error discovering domain. Exit Code:"), e.returncode)
             restore_files = {
                 "/etc/krb5.conf.old": "/etc/krb5.conf",
-                "/etc/samba/smb.conf.old": "/etc/samba/smb.conf"
+                "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
             }
             restore_config_file(restore_files)
             fail_and_exit("Domain discovery failed.")
-        
+
         config_manager.update_nsswitch_conf()
         # domain_user = f"{user}@{domain}"
         # result = subprocess.run(["kinit", domain_user], capture_output=True)
@@ -222,7 +171,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
                 "/etc/hostname.old": "/etc/hostname",
                 "/etc/krb5.conf.old": "/etc/krb5.conf",
                 "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
-                "/etc/nsswitch.conf.old": "/etc/nsswitch.conf"
+                "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
             }
             restore_config_file(restore_files)
             fail_and_exit("Preauthentication failed!")
@@ -232,7 +181,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
             )
 
             result = domain_joiner_winbind.domain_info()
-            
+
             if result:
                 print(_("This computer has been successfully added to the domain."))
             else:
@@ -242,7 +191,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
                     "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
                     "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
                     "/etc/hosts.old": "/etc/hosts",
-                    "/etc/hostname.old": "/etc/hostname"
+                    "/etc/hostname.old": "/etc/hostname",
                 }
                 restore_config_file(restore_files)
                 fail_and_exit("This computer could not be joined to the domain!")
@@ -253,7 +202,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
             "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
             "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
             "/etc/hosts.old": "/etc/hosts",
-            "/etc/hostname.old": "/etc/hostname"
+            "/etc/hostname.old": "/etc/hostname",
         }
         restore_config_file(restore_files)
         fail_and_exit(f"Error while joining domain. Exit Code: {e.stderr}")
@@ -263,51 +212,31 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
             "/etc/krb5.conf.old": "/etc/krb5.conf",
             "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
             "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
-            "/etc/hosts.old": "/etc/hosts"
+            "/etc/hosts.old": "/etc/hosts",
         }
         restore_config_file(restore_files)
         fail_and_exit(f"Error: {e}")
 
 
-def join(
-    comp_name, domain, user, passwd, ouaddress=None, realmd=None, winbind=None
-):
+def join(comp_name, domain, user, passwd, ouaddress=None, realmd=None, winbind=None):
     try:
-        #ouaddress = check_ouaddress(ouaddress, domain)
+        # ouaddress = check_ouaddress(ouaddress, domain)
         if realmd:
             config_manager.start_sssd_service()
             subprocess.run(["pam-auth-update", "--enable", "sss"], capture_output=True)
-            # required packages
-            sssd_pkg_list = [
-                "krb5-user",
-                "samba",
-                "sssd",
-                "libsss-sudo",
-                "realmd",
-                "packagekit",
-                "adcli",
-                "sssd-tools",
-                "cifs-utils",
-                "smbclient",
-            ]
-            # check_and_install_packages(sssd_pkg_list)
+
             handle_realmd_join(comp_name, domain, user, passwd, ouaddress)
         elif winbind:
             config_manager.start_winbind_service()
             subprocess.run(["pam-auth-update", "--disable", "sss"], capture_output=True)
-            winbind_pkg_list = [
-                "samba",
-                "smbclient",
-                "krb5-user",
-                "winbind",
-                "libnss-winbind",
-                "libpam-winbind",
-            ]
-            #check_and_install_packages(winbind_pkg_list)
 
             handle_winbind_join(comp_name, domain, user, passwd, ouaddress)
         else:
-            print(_("No domain join method selected. Please specify either realmd or winbind."))
+            print(
+                _(
+                    "No domain join method selected. Please specify either realmd or winbind."
+                )
+            )
             sys.exit(1)
 
     except subprocess.CalledProcessError as e:
@@ -346,6 +275,7 @@ def leave(realmd=None, winbind=None, user=None, password=None):
         }
         restore_config_file(restore_files)
         config_manager.restore_hostname()
+
 
 def list(realmd=None, winbind=None):
     if realmd:

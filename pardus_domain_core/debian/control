@@ -9,7 +9,6 @@ Homepage: https://www.pardus.org.tr
 Package: pardus-domain-core
 Architecture: all
 Depends: python3 (>=3.5),
-         python3-apt,
          libldap2-dev,
          libsasl2-dev,
          krb5-user, 
