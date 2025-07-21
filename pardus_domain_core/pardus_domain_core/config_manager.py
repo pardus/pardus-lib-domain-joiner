@@ -31,17 +31,19 @@ def restore_hostname():
 
 
 def start_sssd_service():
-    subprocess.call(["systemctl", "stop", "winbind.service"])
-    subprocess.call(["systemctl", "disable", "winbind.service"])
-    subprocess.call(["systemctl", "start", "sssd.service"])
-    subprocess.call(["systemctl", "enable", "sssd.service"])
+    print("Starting sssd service...")
+    subprocess.run(["systemctl", "stop", "winbind.service"], capture_output=True)
+    subprocess.run(["systemctl", "disable", "winbind.service"], capture_output=True)
+    subprocess.run(["systemctl", "start", "sssd.service"], capture_output=True)
+    subprocess.run(["systemctl", "enable", "sssd.service"], capture_output=True)
 
 
 def start_winbind_service():
-    subprocess.call(["systemctl", "stop", "sssd.service"])
-    subprocess.call(["systemctl", "disable", "sssd.service"])
-    subprocess.call(["systemctl", "start", "winbind.service"])
-    subprocess.call(["systemctl", "enable", "winbind.service"])
+    print("Starting winbind service...")
+    subprocess.run(["systemctl", "stop", "sssd.service"], capture_output=True)
+    subprocess.run(["systemctl", "disable", "sssd.service"], capture_output=True)
+    subprocess.run(["systemctl", "start", "winbind.service"], capture_output=True)
+    subprocess.run(["systemctl", "enable", "winbind.service"], capture_output=True)
 
 
 # backup config files before editing them
