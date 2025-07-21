@@ -28,8 +28,6 @@ def restore_hostname():
         subprocess.call(["hostnamectl", "hostname", comp_name])
         print(_("Restored hostname file: "), comp_name)
         restore_config_file("/etc/hosts.old", "/etc/hosts")
-    else:
-        print(_("Failed the restore hostname file."))
 
 
 def start_sssd_service():
