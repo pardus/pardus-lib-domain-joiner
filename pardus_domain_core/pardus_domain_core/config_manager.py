@@ -136,7 +136,9 @@ def update_hosts_file(comp_name, domain=None):
 
 
 def rewrite_conf(file, settings):
-    config = configparser.RawConfigParser()
+    config = configparser.RawConfigParser(
+        strict=False  # strict=False, ignores duplicated options (and other things)
+    )
     config.optionxform = str  # This prevents it from converting keys to lowercase
 
     if os.path.exists(file):
