@@ -316,7 +316,12 @@ def join(
 
 def leave(realmd=None, winbind=None, user=None, password=None):
     if realmd:
-        domain_joiner_realmd.leave(user, password)
+        p = domain_joiner_realmd.leave(user, password)
+        if p.returncode != 0:
+            print(p.stdout)
+            sys.stderr.write(p.stderr)
+            exit(p.returncode)
+
         restore_files = {
             "/etc/hosts.old": "/etc/hosts",
             "/etc/hostname.old": "/etc/hostname",
@@ -326,7 +331,12 @@ def leave(realmd=None, winbind=None, user=None, password=None):
         config_manager.restore_hostname()
 
     elif winbind:
-        domain_joiner_winbind.leave(user, password)
+        p = domain_joiner_winbind.leave(user, password)
+        if p.returncode != 0:
+            print(p.stdout)
+            sys.stderr.write(p.stderr)
+            exit(p.returncode)
+
         restore_files = {
             "/etc/hosts.old": "/etc/hosts",
             "/etc/hostname.old": "/etc/hostname",
