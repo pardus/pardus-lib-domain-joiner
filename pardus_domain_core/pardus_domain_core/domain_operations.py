@@ -32,7 +32,7 @@ def eprint(msg):
 
 
 def fail_and_exit(msg):
-    print(_(msg), file=sys.stderr)
+    print(msg, file=sys.stderr)
     config_manager.restore_hostname()
     sys.exit(1)
 
@@ -58,18 +58,18 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     }
 
     if not os.path.isfile("/etc/krb5.conf"):
-        fail_and_exit("krb5.conf not found. Required packages might be missing.")
+        fail_and_exit(_("krb5.conf not found. Required packages might be missing."))
 
     try:
         result = domain_joiner_realmd.discover(domain)
         if result:
             print(_("Domain discovered..."))
         else:
-            fail_and_exit(f"Domain not found: '{domain}'")
+            fail_and_exit(_("Domain not found:") + " '{domain}'")
 
     except subprocess.CalledProcessError as e:
         print(_("Error discovering domain. Exit Code:"), e.returncode)
-        fail_and_exit("Domain discovery failed.")
+        fail_and_exit(_("Domain discovery failed."))
 
     try:
         # print("domain:", domain)
@@ -109,7 +109,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
 
     # Couldn't connect, restore settings
     restore_config_file(restore_files)
-    fail_and_exit("Joining domain failed.")
+    fail_and_exit(_("Joining domain failed."))
 
 
 def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
@@ -123,10 +123,10 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
 
     found_domain = discover_domain(domain)
     if not found_domain:
-        fail_and_exit(f"Domain not found: '{domain}'")
+        fail_and_exit(_("Domain not found:") + " '{domain}'")
 
     if not os.path.isfile("/etc/krb5.conf"):
-        fail_and_exit("krb5.conf not found. Required packages might be missing.")
+        fail_and_exit(_("krb5.conf not found. Required packages might be missing."))
 
     try:
         print(_("Updating /etc/krb5.conf file..."))
@@ -152,7 +152,9 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
         print("winbind process stderr:", process.stderr)
 
         if process.returncode == 0 and "Joined" in process.stdout:
-            subprocess.run(["systemctl", "restart", "smbd", "nmbd", "winbind"])
+            subprocess.run(
+                ["systemctl", "restart", "smbd", "nmbd", "winbind"], capture_output=True
+            )
 
             p = domain_joiner_winbind.domain_info()
             print("domain_info process code:", p.returncode)
