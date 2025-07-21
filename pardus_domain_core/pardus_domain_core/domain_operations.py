@@ -136,6 +136,8 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
 
         p_discover = domain_joiner_winbind.discover()
         if p_discover.returncode != 0:
+            print("stdout:", p_discover.stdout)
+            eprint("stderr:" + p_discover.stderr)
             restore_config_file(restore_files)
             fail_and_exit("Couldn't discovered the domain")
 
