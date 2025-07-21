@@ -105,7 +105,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
             eprint("stderr:" + process.stderr + "\n")
 
     except Exception as e:
-        eprint(_("Error") + ":" + e + "\n")
+        eprint(_("Error") + f":{e}")
 
     # Couldn't connect, restore settings
     restore_config_file(restore_files)
@@ -169,7 +169,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
         eprint("stderr:" + process.stderr + "\n")
 
     except Exception as e:
-        eprint(_("Error") + ":" + e + "\n")
+        eprint(_("Error") + f":{e}")
 
     restore_config_file(restore_files)
     fail_and_exit("")
