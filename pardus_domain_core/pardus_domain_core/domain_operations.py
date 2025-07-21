@@ -27,6 +27,10 @@ def discover_domain(domain):
     return ""
 
 
+def eprint(msg):
+    print(msg, file=sys.stderr)
+
+
 def fail_and_exit(msg):
     print(_(msg), file=sys.stderr)
     config_manager.restore_hostname()
@@ -48,6 +52,11 @@ def format_ou_dn(ouaddress, domain):
 
 
 def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
+    restore_files = {
+        "/etc/hosts.old": "/etc/hosts",
+        "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
+    }
+
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
 
@@ -55,6 +64,9 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         result = domain_joiner_realmd.discover(domain)
         if result:
             print(_("Domain discovered..."))
+        else:
+            eprint(_("Domain discover failed!"))
+
     except subprocess.CalledProcessError as e:
         print(_("Error discovering domain. Exit Code:"), e.returncode)
         fail_and_exit("Domain discovery failed.")
@@ -69,7 +81,6 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         config_manager.backup_config_file(sssd_file, sssd_file_backup)
 
         ouaddress = format_ou_dn(ouaddress, domain)
-        client = f"{user}@{domain.upper()}"
 
         process = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
         if process.returncode == 0:
@@ -88,22 +99,20 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
 
             print(_("This computer has been successfully added to the domain."))
             return
+        else:
+            eprint(_("Joining domain failed."))
+            print("stdout:", process.stdout)
+            eprint("stderr:" + process.stderr + "\n")
 
     except Exception as e:
-        sys.stderr.write(_("Error") + ":" + e + "\n")
+        eprint(_("Error") + ":" + e + "\n")
 
     # Couldn't connect, restore settings
-    restore_files = {
-        "/etc/hosts.old": "/etc/hosts",
-        "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
-    }
     restore_config_file(restore_files)
-    fail_and_exit("")
+    fail_and_exit("Joining domain failed.")
 
 
 def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
-    found_domain = discover_domain(domain)
-
     restore_files = {
         "/etc/krb5.conf.old": "/etc/krb5.conf",
         "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
@@ -112,6 +121,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
         "/etc/hostname.old": "/etc/hostname",
     }
 
+    found_domain = discover_domain(domain)
     if not found_domain:
         fail_and_exit(f"Domain not found: '{domain}'")
 
@@ -149,9 +159,17 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
             if p.returncode == 0 and p.stdout:
                 print(_("This computer has been successfully added to the domain."))
                 return
+            else:
+                print("stdout:", p.stdout)
+                eprint("stderr:" + p.stderr + "\n")
+
+        # Not joined:
+        eprint(_("Joining domain failed."))
+        print("stdout:", process.stdout)
+        eprint("stderr:" + process.stderr + "\n")
 
     except Exception as e:
-        sys.stderr.write(_("Error") + ":" + e + "\n")
+        eprint(_("Error") + ":" + e + "\n")
 
     restore_config_file(restore_files)
     fail_and_exit("")
@@ -183,37 +201,34 @@ def join(comp_name, domain, user, passwd, ouaddress=None, realmd=None, winbind=N
 
 
 def leave(realmd=None, winbind=None, user=None, password=None):
+    restore_files = {
+        "/etc/hosts.old": "/etc/hosts",
+        "/etc/hostname.old": "/etc/hostname",
+        "/etc/krb5.conf.old": "/etc/krb5.conf",
+        "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
+        "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
+    }
+
+    if not realmd and not winbind:
+        eprint("Please provide connection type, realmd or winbind")
+        exit(1)
+
     if realmd:
         p = domain_joiner_realmd.leave(user, password)
-        if p.returncode != 0:
-            print(p.stdout)
-            sys.stderr.write(p.stderr)
-            exit(p.returncode)
-
-        restore_files = {
-            "/etc/hosts.old": "/etc/hosts",
-            "/etc/hostname.old": "/etc/hostname",
-            "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
-        }
-        restore_config_file(restore_files)
-        config_manager.restore_hostname()
-
     elif winbind:
         p = domain_joiner_winbind.leave(user, password)
-        if p.returncode != 0:
-            print(p.stdout)
-            sys.stderr.write(p.stderr)
-            exit(p.returncode)
 
-        restore_files = {
-            "/etc/hosts.old": "/etc/hosts",
-            "/etc/hostname.old": "/etc/hostname",
-            "/etc/krb5.conf.old": "/etc/krb5.conf",
-            "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
-            "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
-        }
-        restore_config_file(restore_files)
-        config_manager.restore_hostname()
+    # Success
+    print(p.stdout)
+    eprint(p.stderr)
+
+    if p.returncode == 0:
+        return
+
+    # Failure
+    restore_config_file(restore_files)
+    config_manager.restore_hostname()
+    exit(p.returncode)
 
 
 def list(realmd=None, winbind=None):
