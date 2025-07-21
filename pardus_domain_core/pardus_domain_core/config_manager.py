@@ -6,11 +6,12 @@ import subprocess
 import locale
 from locale import gettext as _
 
-locale.bindtextdomain('pardus_domain_core', '/usr/share/locale')
-locale.textdomain('pardus_domain_core')
+locale.bindtextdomain("pardus_domain_core", "/usr/share/locale")
+locale.textdomain("pardus_domain_core")
 
 SYSTEM_LANGUAGE = os.environ.get("LANG")
 locale.setlocale(locale.LC_ALL, SYSTEM_LANGUAGE)
+
 
 def set_hostname(comp_name):
     backup_config_file("/etc/hosts", "/etc/hosts.old")
@@ -30,17 +31,19 @@ def restore_hostname():
     else:
         print(_("Failed the restore hostname file."))
 
+
 def start_sssd_service():
-    subprocess.call(["systemctl","stop","winbind.service"])
-    subprocess.call(["systemctl","disable","winbind.service"])
-    subprocess.call(["systemctl","start","sssd.service"])
-    subprocess.call(["systemctl","enable","sssd.service"])
+    subprocess.call(["systemctl", "stop", "winbind.service"])
+    subprocess.call(["systemctl", "disable", "winbind.service"])
+    subprocess.call(["systemctl", "start", "sssd.service"])
+    subprocess.call(["systemctl", "enable", "sssd.service"])
+
 
 def start_winbind_service():
-    subprocess.call(["systemctl","stop","sssd.service"])
-    subprocess.call(["systemctl","disable","sssd.service"])
-    subprocess.call(["systemctl","start","winbind.service"])
-    subprocess.call(["systemctl","enable","winbind.service"])
+    subprocess.call(["systemctl", "stop", "sssd.service"])
+    subprocess.call(["systemctl", "disable", "sssd.service"])
+    subprocess.call(["systemctl", "start", "winbind.service"])
+    subprocess.call(["systemctl", "enable", "winbind.service"])
 
 
 # backup config files before editing them
@@ -61,6 +64,10 @@ def restore_config_file(backup_file, source_file):
         try:
             shutil.copy2(backup_file, source_file)
             print(_(f"{source_file} has been restored from backup."))
+
+            # Remove old backup to prevent restoring it again
+            os.remove(backup_file)
+
         except Exception as e:
             print(_(f"An error occurred while restoring {source_file}. Error: {e}"))
     else:
@@ -86,6 +93,7 @@ def update_hostname_file(comp_name, domain=None):
         else:
             print(_("Done"))
 
+
 def update_hosts_file(comp_name, domain=None):
     # to check file /etc/hosts
     hosts_file = "/etc/hosts"
@@ -106,7 +114,9 @@ def update_hosts_file(comp_name, domain=None):
     updated = False
 
     full_hostname = f"{comp_name}.{domain}" if domain else comp_name
-    new_entry = f"127.0.1.1 {full_hostname} {comp_name}" if domain else f"127.0.1.1 {comp_name}"
+    new_entry = (
+        f"127.0.1.1 {full_hostname} {comp_name}" if domain else f"127.0.1.1 {comp_name}"
+    )
 
     for line in lines:
         if line.strip().startswith("127.0.1.1"):
@@ -147,7 +157,7 @@ def rewrite_conf(file, settings):
 def update_samba_conf_for_sssd(domain):
     smb_file = "/etc/samba/smb.conf"
     smb_file_backup = "/etc/samba/smb.conf.old"
-    backup_config_file(smb_file,smb_file_backup)
+    backup_config_file(smb_file, smb_file_backup)
     samba_settings = {
         "global": {
             "unix charset": "UTF-8",
@@ -203,33 +213,33 @@ def update_sssd_conf(domain):
 def update_samba_conf_for_winbind(domain):
     smb_file = "/etc/samba/smb.conf"
     smb_file_backup = "/etc/samba/smb.conf.old"
-    backup_config_file(smb_file,smb_file_backup)
+    backup_config_file(smb_file, smb_file_backup)
     samba_settings = {
         "global": {
-            "realm" : domain,
-            "workgroup" : domain.split(".")[0].upper(),
-            "security" : "ads",
-            "domain logons" : "no",
-            "password server" : domain,
-            "template homedir" : "/home/%D/%U",
-            "template shell" : "/bin/bash",
-            "winbind enum groups" : "yes",
-            "winbind enum users" : "yes",
-            "winbind use default domain" : "yes",
-            "domain master" : "no",
-            "local master" : "no",
-            "prefered master" : "no",
-            "os level" : "0",
-            "idmap config *:backend" : "tdb",
-            "idmap config *:range" : "11000-20000",
-            "idmap config DOMAIN:backend" : "rid",
-            "idmap config DOMAIN:range":"10000000-19000000",
-            "idmap uid = 10000-20000 idmap gid" : "10000-20000",
-            "client use spnego" : "yes",
-            "client ntlmv2 auth" : "yes",
-            "encrypt passwords" : "yes", 
-            "winbind use default domain" : "yes",
-            "restrict anonymous" : "2"
+            "realm": domain,
+            "workgroup": domain.split(".")[0].upper(),
+            "security": "ads",
+            "domain logons": "no",
+            "password server": domain,
+            "template homedir": "/home/%D/%U",
+            "template shell": "/bin/bash",
+            "winbind enum groups": "yes",
+            "winbind enum users": "yes",
+            "winbind use default domain": "yes",
+            "domain master": "no",
+            "local master": "no",
+            "prefered master": "no",
+            "os level": "0",
+            "idmap config *:backend": "tdb",
+            "idmap config *:range": "11000-20000",
+            "idmap config DOMAIN:backend": "rid",
+            "idmap config DOMAIN:range": "10000000-19000000",
+            "idmap uid = 10000-20000 idmap gid": "10000-20000",
+            "client use spnego": "yes",
+            "client ntlmv2 auth": "yes",
+            "encrypt passwords": "yes",
+            "winbind use default domain": "yes",
+            "restrict anonymous": "2",
         },
     }
     print(_("Updating /etc/samba/smb.conf file for winbind..."))
@@ -246,7 +256,7 @@ def update_nsswitch_conf():
 
     with open(nsswitch_file, "r") as file:
         lines = file.readlines()
-    
+
     new_lines = []
 
     for line in lines:
@@ -265,9 +275,8 @@ def update_nsswitch_conf():
             new_lines.append(new_line)
         else:
             new_lines.append(line)
-    
 
-    print(_("Updating /etc/nsswitch.conf file for winbind..."))    
+    print(_("Updating /etc/nsswitch.conf file for winbind..."))
     with open(nsswitch_file, "w") as file:
         file.writelines(new_lines)
     print(_("Updated /etc/nsswitch.conf file for winbind..."))
