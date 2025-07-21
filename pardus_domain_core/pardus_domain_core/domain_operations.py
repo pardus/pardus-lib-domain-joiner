@@ -28,11 +28,11 @@ def discover_domain(domain):
 
 
 def eprint(msg):
-    print(msg, file=sys.stderr)
+    print(msg, file=sys.stderr, flush=True)
 
 
 def fail_and_exit(msg):
-    print(msg, file=sys.stderr)
+    print(msg, file=sys.stderr, flush=True)
     config_manager.restore_hostname()
     sys.exit(1)
 
@@ -101,7 +101,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
             return
         else:
             eprint(_("Joining domain failed."))
-            print("stdout:", process.stdout)
+            print("stdout:", process.stdout, flush=True)
             eprint("stderr:" + process.stderr + "\n")
 
     except Exception as e:
@@ -136,7 +136,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
 
         p_discover = domain_joiner_winbind.discover()
         if p_discover.returncode != 0:
-            print("stdout:", p_discover.stdout)
+            print("stdout:", p_discover.stdout, flush=True)
             eprint("stderr:" + p_discover.stderr)
             restore_config_file(restore_files)
             fail_and_exit("Couldn't discovered the domain")
@@ -146,9 +146,9 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
         config_manager.update_hosts_file(comp_name, domain)
 
         process = domain_joiner_winbind.join(user, passwd, ouaddress)
-        print("winbind process code:", process.returncode)
-        print("winbind process stdout:", process.stdout)
-        print("winbind process stderr:", process.stderr)
+        print("winbind process code:", process.returncode, flush=True)
+        print("winbind process stdout:", process.stdout, flush=True)
+        print("winbind process stderr:", process.stderr, flush=True)
 
         if process.returncode == 0 and "Joined" in process.stdout:
             subprocess.run(
@@ -163,20 +163,20 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
             )
 
             p = domain_joiner_winbind.domain_info()
-            print("domain_info process code:", p.returncode)
-            print("domain_info process stdout:", p.stdout)
-            print("domain_info process stderr:", p.stderr)
+            print("domain_info process code:", p.returncode, flush=True)
+            print("domain_info process stdout:", p.stdout, flush=True)
+            print("domain_info process stderr:", p.stderr, flush=True)
 
             if p.returncode == 0 and p.stdout:
                 print(_("This computer has been successfully added to the domain."))
                 return
             else:
-                print("stdout:", p.stdout)
+                print("stdout:", p.stdout, flush=True)
                 eprint("stderr:" + p.stderr)
 
         # Not joined:
         eprint(_("Joining domain failed."))
-        print("stdout:", process.stdout)
+        print("stdout:", process.stdout, flush=True)
         eprint("stderr:" + process.stderr)
 
     except Exception as e:
@@ -230,7 +230,7 @@ def leave(realmd=None, winbind=None, user=None, password=None):
         p = domain_joiner_winbind.leave(user, password)
 
     # Success
-    print(p.stdout)
+    print(p.stdout, flush=True)
     eprint(p.stderr)
 
     if p.returncode == 0:
