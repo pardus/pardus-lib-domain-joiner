@@ -2,10 +2,14 @@ import subprocess
 
 
 def discover(domain):
-    process = subprocess.check_output(["realm", "discover", "-v", domain]).decode(
-        "utf-8"
+    process = subprocess.run(
+        ["realm", "discover", "-v", domain], capture_output=True, text=True
     )
-    return process
+
+    if process.returncode == 0:
+        return process.stdout
+
+    return ""
 
 
 def join(domain, user, passwd, ouaddress):
@@ -23,12 +27,10 @@ def join(domain, user, passwd, ouaddress):
             domain.upper(),
         ]
 
-    print(join_command)
+    # print(join_command)
     process = subprocess.run(join_command, input=passwd, text=True, capture_output=True)
-    stderr = process.stderr
-    msg = stderr.strip().split("*")[-1]
 
-    return msg
+    return process
 
 
 def leave(user, password):

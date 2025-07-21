@@ -1,12 +1,6 @@
 import subprocess
 
 
-def get_returncode(process):
-    if process.returncode == 0:
-        return True
-    return False
-
-
 def discover():
     return subprocess.run(["net", "ads", "info"], capture_output=True, text=True)
 
@@ -30,13 +24,13 @@ def leave(user, password):
 
 
 def domain_info():
-    return subprocess.run(["net", "ads", "testjoin"], capture_output=True)
+    return subprocess.run(["net", "ads", "testjoin"], capture_output=True, text=True)
 
 
 def list_users():
     # subprocess.run(["net", "ads", "user"])
-    return subprocess.run(["wbinfo", "-u"], capture_output=True)
+    return subprocess.run(["wbinfo", "-u"], capture_output=True, text=True)
 
 
 def list_group():
-    return subprocess.run(["wbinfo", "-g"], capture_output=True)
+    return subprocess.run(["wbinfo", "-g"], capture_output=True, text=True)

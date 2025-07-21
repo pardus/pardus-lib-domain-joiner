@@ -18,24 +18,17 @@ locale.setlocale(locale.LC_ALL, SYSTEM_LANGUAGE)
 
 
 def discover_domain(domain):
-    result = subprocess.run(["nslookup", domain], capture_output=True, text=True)
+    process = subprocess.run(["nslookup", domain], capture_output=True, text=True)
 
-    output = result.stdout
-    error = result.stderr
+    if process.returncode == 0:
+        output = process.stdout.strip()
+        return output
 
-    if "can't find" in output or "non-existent domain" in output:
-        print(_("Domain name not found!"))
-        sys.exit(1)
-    elif result.returncode != 0:
-        print(_(f"An error occured: {error}"))
-        sys.exit(1)
-    else:
-        domain_output = output.strip()
-        print(_(f"Domain discovered:\n{domain_output}"))
+    return ""
 
 
 def fail_and_exit(msg):
-    print(_(msg), file=sys.stdout)
+    print(_(msg), file=sys.stderr)
     config_manager.restore_hostname()
     sys.exit(1)
 
@@ -76,19 +69,10 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         config_manager.backup_config_file(sssd_file, sssd_file_backup)
 
         ouaddress = format_ou_dn(ouaddress, domain)
-
-        messages = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
         client = f"{user}@{domain.upper()}"
 
-        if "Preauthentication failed" in messages:
-            fail_and_exit("Preauthentication failed!")
-        elif f"Client '{client}' not found in Kerberos database" in messages:
-            fail_and_exit(f"Client '{client}' not found in Kerberos database!")
-        elif "The organizational unit does not exist" in messages:
-            fail_and_exit("The organizational unit does not exist.")
-        elif "not in the desired organizational unit" in messages:
-            fail_and_exit("Not in the desired organizational unit.")
-        elif "Successfully enrolled machine in realm" in messages:
+        process = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
+        if process.returncode == 0:
             config_manager.update_hostname_file(comp_name, domain)
             config_manager.update_hosts_file(comp_name, domain)
 
@@ -103,35 +87,34 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
             )
 
             print(_("This computer has been successfully added to the domain."))
-        else:
-            print(_("This computer could not be joined to the domain!"))
-            restore_files = {
-                "/etc/hosts.old": "/etc/hosts",
-                "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
-            }
-            restore_config_file(restore_files)
-            fail_and_exit("This computer could not be joined to the domain!")
+            return
 
-    except subprocess.CalledProcessError as e:
-        print(_("Error while joining domain. Exit Code:"), e.stderr)
-        restore_files = {
-            "/etc/hosts.old": "/etc/hosts",
-            "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
-        }
-        restore_config_file(restore_files)
-        fail_and_exit("Error while joining domain.")
     except Exception as e:
-        print(_(f"Error: {e}"))
-        restore_files = {
-            "/etc/hosts.old": "/etc/hosts",
-            "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
-        }
-        restore_config_file(restore_files)
-        fail_and_exit(f"Error: {e}")
+        sys.stderr.write(_("Error") + ":" + e + "\n")
+
+    # Couldn't connect, restore settings
+    restore_files = {
+        "/etc/hosts.old": "/etc/hosts",
+        "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
+    }
+    restore_config_file(restore_files)
+    fail_and_exit("")
 
 
 def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
-    discover_domain(domain)
+    found_domain = discover_domain(domain)
+
+    restore_files = {
+        "/etc/krb5.conf.old": "/etc/krb5.conf",
+        "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
+        "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
+        "/etc/hosts.old": "/etc/hosts",
+        "/etc/hostname.old": "/etc/hostname",
+    }
+
+    if not found_domain:
+        fail_and_exit(f"Domain not found: '{domain}'")
+
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
 
@@ -141,81 +124,37 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
         print(_("Updated /etc/krb5.conf file..."))
         config_manager.update_samba_conf_for_winbind(domain)
 
-        try:
-            result = domain_joiner_winbind.discover()
-            if result:
-                print(_("Domain discovered..."))
-        except subprocess.CalledProcessError as e:
-            print(_("Error discovering domain. Exit Code:"), e.returncode)
-            restore_files = {
-                "/etc/krb5.conf.old": "/etc/krb5.conf",
-                "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
-            }
+        p_discover = domain_joiner_winbind.discover()
+        if p_discover.returncode != 0:
             restore_config_file(restore_files)
-            fail_and_exit("Domain discovery failed.")
+            fail_and_exit("")
 
         config_manager.update_nsswitch_conf()
-        # domain_user = f"{user}@{domain}"
-        # result = subprocess.run(["kinit", domain_user], capture_output=True)
-        # print("result:",result, "\n", result.returncode)
         config_manager.update_hostname_file(comp_name, domain)
         config_manager.update_hosts_file(comp_name, domain)
-        msg = domain_joiner_winbind.join(user, passwd, ouaddress)
-        # print("msg: ", msg)
 
-        messages = msg.stdout.split("\n")[-2]
+        process = domain_joiner_winbind.join(user, passwd, ouaddress)
+        print("winbind process code:", process.returncode)
+        print("winbind process stdout:", process.stdout)
+        print("winbind process stderr:", process.stderr)
 
-        if "a bad username or authentication information" in messages:
-            restore_files = {
-                "/etc/hosts.old": "/etc/hosts",
-                "/etc/hostname.old": "/etc/hostname",
-                "/etc/krb5.conf.old": "/etc/krb5.conf",
-                "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
-                "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
-            }
-            restore_config_file(restore_files)
-            fail_and_exit("Preauthentication failed!")
-        elif "Joined" in messages:
-            subprocess.run(
-                ["systemctl", "restart", "smbd", "nmbd", "winbind"], capture_output=True
-            )
+        if process.returncode == 0 and "Joined" in process.stdout:
+            subprocess.run(["systemctl", "restart", "smbd", "nmbd", "winbind"])
 
-            result = domain_joiner_winbind.domain_info()
+            p = domain_joiner_winbind.domain_info()
+            print("domain_info process code:", p.returncode)
+            print("domain_info process stdout:", p.stdout)
+            print("domain_info process stderr:", p.stderr)
 
-            if result:
+            if p.returncode == 0 and p.stdout:
                 print(_("This computer has been successfully added to the domain."))
-            else:
-                print(_("This computer could not be joined to the domain!"))
-                restore_files = {
-                    "/etc/krb5.conf.old": "/etc/krb5.conf",
-                    "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
-                    "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
-                    "/etc/hosts.old": "/etc/hosts",
-                    "/etc/hostname.old": "/etc/hostname",
-                }
-                restore_config_file(restore_files)
-                fail_and_exit("This computer could not be joined to the domain!")
-    except subprocess.CalledProcessError as e:
-        print(_("Error while joining domain. Exit Code:"), e.stderr)
-        restore_files = {
-            "/etc/krb5.conf.old": "/etc/krb5.conf",
-            "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
-            "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
-            "/etc/hosts.old": "/etc/hosts",
-            "/etc/hostname.old": "/etc/hostname",
-        }
-        restore_config_file(restore_files)
-        fail_and_exit(f"Error while joining domain. Exit Code: {e.stderr}")
+                return
+
     except Exception as e:
-        print(_(f"Error: {e}"))
-        restore_files = {
-            "/etc/krb5.conf.old": "/etc/krb5.conf",
-            "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
-            "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
-            "/etc/hosts.old": "/etc/hosts",
-        }
-        restore_config_file(restore_files)
-        fail_and_exit(f"Error: {e}")
+        sys.stderr.write(_("Error") + ":" + e + "\n")
+
+    restore_config_file(restore_files)
+    fail_and_exit("")
 
 
 def join(comp_name, domain, user, passwd, ouaddress=None, realmd=None, winbind=None):
