@@ -208,7 +208,7 @@ def update_sssd_conf(domain):
     print(_("Updating /etc/sssd/sssd.conf file..."))
     rewrite_conf(sssd_file, sssd_settings)
     os.chmod(sssd_file, 600)
-    subprocess.call(["systemctl", "restart ", "sssd"])
+    subprocess.call(["systemctl", "restart ", "sssd.service"])
     print(_("Updated /etc/sssd/sssd.conf file..."))
 
 

@@ -150,7 +150,14 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
 
         if process.returncode == 0 and "Joined" in process.stdout:
             subprocess.run(
-                ["systemctl", "restart", "smbd", "nmbd", "winbind"], capture_output=True
+                [
+                    "systemctl",
+                    "restart",
+                    "smbd.service",
+                    "nmbd.service",
+                    "winbind.service",
+                ],
+                capture_output=True,
             )
 
             p = domain_joiner_winbind.domain_info()
