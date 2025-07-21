@@ -65,7 +65,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         if result:
             print(_("Domain discovered..."))
         else:
-            eprint(_("Domain discover failed!"))
+            fail_and_exit(f"Domain not found: '{domain}'")
 
     except subprocess.CalledProcessError as e:
         print(_("Error discovering domain. Exit Code:"), e.returncode)
@@ -134,10 +134,13 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
         print(_("Updated /etc/krb5.conf file..."))
         config_manager.update_samba_conf_for_winbind(domain)
 
+        # TODO: Is this ignorable? We doesn't use this discovered domain value in anywhere. Also found_domain have this information.
+        """
         p_discover = domain_joiner_winbind.discover()
         if p_discover.returncode != 0:
             restore_config_file(restore_files)
-            fail_and_exit("")
+            fail_and_exit("Couldn't discovered the domain")
+        """
 
         config_manager.update_nsswitch_conf()
         config_manager.update_hostname_file(comp_name, domain)
@@ -161,12 +164,12 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
                 return
             else:
                 print("stdout:", p.stdout)
-                eprint("stderr:" + p.stderr + "\n")
+                eprint("stderr:" + p.stderr)
 
         # Not joined:
         eprint(_("Joining domain failed."))
         print("stdout:", process.stdout)
-        eprint("stderr:" + process.stderr + "\n")
+        eprint("stderr:" + process.stderr)
 
     except Exception as e:
         eprint(_("Error") + f":{e}")
