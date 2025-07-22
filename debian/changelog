@@ -1,0 +1,73 @@
+libpardus-domain-joiner (0.1.0) yirmiuc; urgency=medium
+
+  [ busra.cagliyan ]
+  * Initial commit
+
+  [ busra ]
+  * Add pardus-domain-joiner library
+  * Remove .pybuild from version control
+  * Add .gitignore file
+  * Rename directory: pardus-domain-core -> pardus_domain_core
+  * Ranamed app
+  * Add error message and ouaddress for winbind
+  * Enable output capturing in subprocess call
+  * Enable output capturing in subprocess call
+  * Update package name
+  * first commit
+  * Remove .pybuild
+  * Add .gitignore file
+  * Refactor domain name listing function
+  * Update error messages
+  * Add function to prevent empty OU value
+  * Fix: don't include OU parameter when value is empty
+
+  [ Emin Fedar ]
+  * Update pardus_domain_core/pardus_domain_core/domain_joiner_realmd.py
+  * Update pardus_domain_core/debian/control
+
+  [ busra ]
+  * Fix: backup sssd file without join the domain
+  * Fix: typos
+  * Add translation
+  * Fix: add missing locale configuration for gettext
+  * Fix: set system locale from environment LANG variable
+  * Update debian/control file in core
+  * Update required arguments
+  * Update pardus_debian_core's debian/changelog
+  * feat: Add dependencies and adjust service start/stop states accordingly
+  * Remove newline split from discover_domain func
+  * Remove samba setting for sssd
+  * Remove arguments that are not needed for now
+  * Add ou variable for winbind
+  * Add parameter to command for deleting user with sssd from AD
+  * Skip domain join if the domain name is incorrect
+  * Update hosts func
+  * Add ou parameter to command if defined for winbind service
+  * Update hostname file
+  * Add missing backup file
+  * Add user manual for cli
+  * Remove capture_output from subprocess.run
+  * Update leave func for sssd
+  * Update cli
+  * update version
+  * Update ouaddress
+
+  [ Emin Fedar ]
+  * feat: added return code on leave
+  * fix: remove apt residues
+  * fix: code refactor on subprocesses
+  * feat: added timeout to winbind requests
+  * fix: remove backup files after restore
+  * fix: improve join & leave
+  * fix: no error if there is nothing to restore
+  * fix: str concat error on eprint
+  * fix: duplicate options
+  * fix: discover fail output
+  * fix: hide verbose systemctl logs
+  * fix: improved logs
+  * fix: enable second domain discover after conf files set
+  * fix: systemctl command typo fix
+  * fix: show logs of process
+  * feat: flush print
+
+ -- Emin Fedar <emin.fedar@pardus.org.tr>  Tue, 22 Jul 2025 15:40:11 +0300

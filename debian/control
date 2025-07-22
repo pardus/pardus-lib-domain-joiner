@@ -1,14 +1,15 @@
-Source: pardus-domain-core
+Source: libpardus-domain-joiner
 Section: utils
 Priority: optional
 Maintainer: Pardus Altyapı <altyapi@pardus.org.tr>
-Build-Depends: debhelper (>= 10), dh-python, python3-all, python3-setuptools, python3-dev
+Build-Depends: debhelper (>= 12), meson
 Standards-Version: 4.6.1
 Homepage: https://www.pardus.org.tr
 
-Package: pardus-domain-core
+Package: libpardus-domain-joiner
 Architecture: all
-Depends: python3 (>=3.5),
+Depends: ${misc:Depends},
+         python3 (>=3.5),
          libldap2-dev,
          libsasl2-dev,
          krb5-user, 
@@ -25,5 +26,5 @@ Depends: python3 (>=3.5),
          winbind,
          libnss-winbind,
          libpam-winbind
-Description: Pardus Domain Settings 
-  This application is a library for ui/cli application that joins your computer to the domain or leaves it from the domain.
+Description: Core library for Pardus Domain Joiner
+ Pardus Domain Joiner GUI and CLI applications depends on this library  
