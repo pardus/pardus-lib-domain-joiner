@@ -1,16 +1,5 @@
-"""
-
-"""
-import os
 import ldap
-import locale
-from locale import gettext as _
 
-locale.bindtextdomain('pardus_domain_core', '/usr/share/locale')
-locale.textdomain('pardus_domain_core')
-
-SYSTEM_LANGUAGE = os.environ.get("LANG")
-locale.setlocale(locale.LC_ALL, SYSTEM_LANGUAGE)
 
 class LDAP:
     def __init__(self, address, username, password):
@@ -26,7 +15,7 @@ class LDAP:
             self.conn.protocol_version = 3
             self.conn.set_option(ldap.OPT_REFERRALS, 0)
         except ldap.LDAPError as e:
-            print(_(f"Failed to initialize LDAP connection: {e}"))
+            print(f"Failed to initialize LDAP connection: {e}")
             self.conn = None
 
     def authenticate(self):
@@ -36,13 +25,13 @@ class LDAP:
 
         try:
             self.conn.simple_bind_s(self.username, self.password)
-            print(_("LDAP authentication successful!"))
+            print("LDAP authentication successful!")
             return True
         except ldap.LDAPError as e:
-            print(_(f"LDAP error: {e}"))
+            print(f"LDAP error: {e}")
             return False
         except Exception as e:
-            print(_(f"An error occurred: {e}"))
+            print(f"An error occurred: {e}")
             return False
 
     def check_computer_exists_in_ad(self, hostname):
@@ -60,15 +49,17 @@ class LDAP:
             if result:
                 for dn, entry in result:
                     if dn and entry:
-                        print(_(f"Hostname {hostname} already exists in Active Directory!"))
-                        # print(_(f"Found dn: {dn}"))
-                        # print(_(f"Found entry: {entry}"))
+                        print(
+                            f"Hostname {hostname} already exists in Active Directory!"
+                        )
+                        # print(f"Found dn: {dn}")
+                        # print(f"Found entry: {entry}")
                         return entry
                     else:
-                        print(_(f"Hostname {hostname} is available to use."))
+                        print(f"Hostname {hostname} is available to use.")
                         return None
         except ldap.LDAPError as e:
-            print(_(f"LDAP search failed: {e}"))
+            print(f"LDAP search failed: {e}")
             return None
         finally:
             self._unbind_connection()
@@ -82,4 +73,4 @@ class LDAP:
         """Close the LDAP connection."""
         if self.conn:
             self.conn.unbind_s()
-            print(_("Connection closed."))
+            print("Connection closed.")

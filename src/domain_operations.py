@@ -2,19 +2,10 @@ import os
 import subprocess
 import sys
 
-from pardus_domain_core import domain_joiner_realmd
-from pardus_domain_core import domain_joiner_winbind
-from pardus_domain_core import config_manager
-from pardus_domain_core import update_krb5_config
-
-import locale
-from locale import gettext as _
-
-locale.bindtextdomain("pardus_domain_core", "/usr/share/locale")
-locale.textdomain("pardus_domain_core")
-
-SYSTEM_LANGUAGE = os.environ.get("LANG")
-locale.setlocale(locale.LC_ALL, SYSTEM_LANGUAGE)
+from pardus_domain_joiner import domain_joiner_realmd
+from pardus_domain_joiner import domain_joiner_winbind
+from pardus_domain_joiner import config_manager
+from pardus_domain_joiner import update_krb5_config
 
 
 def discover_domain(domain):
@@ -58,22 +49,22 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     }
 
     if not os.path.isfile("/etc/krb5.conf"):
-        fail_and_exit(_("krb5.conf not found. Required packages might be missing."))
+        fail_and_exit("krb5.conf not found. Required packages might be missing.")
 
     try:
         result = domain_joiner_realmd.discover(domain)
         if result:
-            print(_("Domain discovered..."))
+            print("Domain discovered...")
         else:
-            fail_and_exit(_("Domain not found:") + " '{domain}'")
+            fail_and_exit("Domain not found:" + " '{domain}'")
 
     except subprocess.CalledProcessError as e:
-        print(_("Error discovering domain. Exit Code:"), e.returncode)
-        fail_and_exit(_("Domain discovery failed."))
+        print("Error discovering domain. Exit Code:", e.returncode)
+        fail_and_exit("Domain discovery failed.")
 
     try:
         # print("domain:", domain)
-        print(_("Joining the domain..."))
+        print("Joining the domain...")
 
         # If there is a sssd file, take a backup.
         sssd_file = "/etc/sssd/sssd.conf"
@@ -97,19 +88,19 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
                 env={**os.environ, "DEBIAN_FRONTEND": "noninteractive"},
             )
 
-            print(_("This computer has been successfully added to the domain."))
+            print("This computer has been successfully added to the domain.")
             return
         else:
-            eprint(_("Joining domain failed."))
+            eprint("Joining domain failed.")
             print("stdout:", process.stdout, flush=True)
             eprint("stderr:" + process.stderr + "\n")
 
     except Exception as e:
-        eprint(_("Error") + f":{e}")
+        eprint("Error" + f":{e}")
 
     # Couldn't connect, restore settings
     restore_config_file(restore_files)
-    fail_and_exit(_("Joining domain failed."))
+    fail_and_exit("Joining domain failed.")
 
 
 def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
@@ -123,15 +114,15 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
 
     found_domain = discover_domain(domain)
     if not found_domain:
-        fail_and_exit(_("Domain not found:") + " '{domain}'")
+        fail_and_exit("Domain not found:" + " '{domain}'")
 
     if not os.path.isfile("/etc/krb5.conf"):
-        fail_and_exit(_("krb5.conf not found. Required packages might be missing."))
+        fail_and_exit("krb5.conf not found. Required packages might be missing.")
 
     try:
-        print(_("Updating /etc/krb5.conf file..."))
+        print("Updating /etc/krb5.conf file...")
         update_krb5_config.update_krb5_conf(domain)
-        print(_("Updated /etc/krb5.conf file..."))
+        print("Updated /etc/krb5.conf file...")
         config_manager.update_samba_conf_for_winbind(domain)
 
         p_discover = domain_joiner_winbind.discover()
@@ -168,19 +159,19 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
             print("domain_info process stderr:", p.stderr, flush=True)
 
             if p.returncode == 0 and p.stdout:
-                print(_("This computer has been successfully added to the domain."))
+                print("This computer has been successfully added to the domain.")
                 return
             else:
                 print("stdout:", p.stdout, flush=True)
                 eprint("stderr:" + p.stderr)
 
         # Not joined:
-        eprint(_("Joining domain failed."))
+        eprint("Joining domain failed.")
         print("stdout:", process.stdout, flush=True)
         eprint("stderr:" + process.stderr)
 
     except Exception as e:
-        eprint(_("Error") + f":{e}")
+        eprint("Error" + f":{e}")
 
     restore_config_file(restore_files)
     fail_and_exit("")
@@ -201,14 +192,12 @@ def join(comp_name, domain, user, passwd, ouaddress=None, realmd=None, winbind=N
             handle_winbind_join(comp_name, domain, user, passwd, ouaddress)
         else:
             print(
-                _(
-                    "No domain join method selected. Please specify either realmd or winbind."
-                )
+                "No domain join method selected. Please specify either realmd or winbind."
             )
             sys.exit(1)
 
     except subprocess.CalledProcessError as e:
-        print(_("An error occurred during the join process:"), e.stderr)
+        print("An error occurred during the join process:", e.stderr)
 
 
 def leave(realmd=None, winbind=None, user=None, password=None):
