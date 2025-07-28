@@ -1,3 +1,16 @@
+libpardus-domain-joiner (0.1.1) yirmiuc; urgency=medium
+
+  [ Emin Fedar ]
+  * feat: remove locales
+
+  [ busra ]
+  * fix typos
+  * add function that finds netbios
+  * Add warning if workgroup is missing from smb.conf
+  * Add workgroup as a parameter
+
+ -- Büşra ÇAĞLIYAN <busra.cagliyan@pardus.org.tr>  Mon, 28 Jul 2025 16:02:00 +0300
+
 libpardus-domain-joiner (0.1.0) yirmiuc; urgency=medium
 
   [ busra.cagliyan ]
