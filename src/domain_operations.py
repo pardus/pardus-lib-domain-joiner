@@ -17,6 +17,17 @@ def discover_domain(domain):
 
     return ""
 
+def get_netbios_name(domain):
+    result = subprocess.run(["nmblookup", "-A", domain], text=True, capture_output=True)
+    netbios = ""
+
+    lines = result.stdout.strip().split("\n")
+    for line in lines:
+        if "GROUP" in line:
+            netbios = line.strip().split("<")[0]
+            return netbios
+
+    return netbios
 
 def eprint(msg):
     print(msg, file=sys.stderr, flush=True)
@@ -119,11 +130,15 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
 
+    workgroup = get_netbios_name(domain)
+    if not workgroup:
+        fail_and_exit("Warning: Could not determine the workgroup. Please make sure the 'workgroup' parameter is defined under the [global] section in /etc/samba/smb.conf.")
+
     try:
         print("Updating /etc/krb5.conf file...")
         update_krb5_config.update_krb5_conf(domain)
         print("Updated /etc/krb5.conf file...")
-        config_manager.update_samba_conf_for_winbind(domain)
+        config_manager.update_samba_conf_for_winbind(domain, workgroup)
 
         p_discover = domain_joiner_winbind.discover()
         if p_discover.returncode != 0:
