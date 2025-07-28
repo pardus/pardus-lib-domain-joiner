@@ -202,15 +202,29 @@ def update_sssd_conf(domain):
     subprocess.call(["systemctl", "restart ", "sssd.service"])
     print("Updated /etc/sssd/sssd.conf file...")
 
+def get_netbios_name(domain):
+    result = subprocess.run(["nmblookup", "-A", domain], text=True, capture_output=True)
+    netbios = ""
+
+    lines = result.stdout.strip().split("\n")
+    for line in lines:
+        if "GROUP" in line:
+            netbios = line.strip().split("<")[0]
+            return netbios
+
+    return netbios
 
 def update_samba_conf_for_winbind(domain):
     smb_file = "/etc/samba/smb.conf"
     smb_file_backup = "/etc/samba/smb.conf.old"
     backup_config_file(smb_file, smb_file_backup)
+
+    workgroup = get_netbios_name(domain)
+    # print("workgroup", workgroup)
     samba_settings = {
         "global": {
             "realm": domain,
-            "workgroup": domain.split(".")[0].upper(),
+            "workgroup": workgroup,
             "security": "ads",
             "domain logons": "no",
             "password server": domain,
