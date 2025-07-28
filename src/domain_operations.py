@@ -114,7 +114,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     fail_and_exit("Joining domain failed.")
 
 
-def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
+def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
     restore_files = {
         "/etc/krb5.conf.old": "/etc/krb5.conf",
         "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
@@ -129,10 +129,6 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
 
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
-
-    workgroup = get_netbios_name(domain)
-    if not workgroup:
-        fail_and_exit("Warning: Could not determine the workgroup. Please make sure the 'workgroup' parameter is defined under the [global] section in /etc/samba/smb.conf.")
 
     try:
         print("Updating /etc/krb5.conf file...")
@@ -192,7 +188,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
     fail_and_exit("")
 
 
-def join(comp_name, domain, user, passwd, ouaddress=None, realmd=None, winbind=None):
+def join(comp_name, domain, user, passwd, ouaddress=None, workgroup=None, realmd=None, winbind=None):
     try:
         # ouaddress = check_ouaddress(ouaddress, domain)
         if realmd:
@@ -204,7 +200,7 @@ def join(comp_name, domain, user, passwd, ouaddress=None, realmd=None, winbind=N
             config_manager.start_winbind_service()
             subprocess.run(["pam-auth-update", "--disable", "sss"], capture_output=True)
 
-            handle_winbind_join(comp_name, domain, user, passwd, ouaddress)
+            handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup)
         else:
             print(
                 "No domain join method selected. Please specify either realmd or winbind."
