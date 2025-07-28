@@ -56,7 +56,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         if result:
             print("Domain discovered...")
         else:
-            fail_and_exit("Domain not found:" + " '{domain}'")
+            fail_and_exit("Domain not found:" + f" '{domain}'")
 
     except subprocess.CalledProcessError as e:
         print("Error discovering domain. Exit Code:", e.returncode)
@@ -114,7 +114,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress):
 
     found_domain = discover_domain(domain)
     if not found_domain:
-        fail_and_exit("Domain not found:" + " '{domain}'")
+        fail_and_exit("Domain not found:" + f" '{domain}'")
 
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
