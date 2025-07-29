@@ -1,3 +1,11 @@
+libpardus-domain-joiner (0.1.2) yirmiuc; urgency=medium
+
+  [ busra ]
+  * trim whitespace
+  * update set_hostname
+
+ -- Büşra ÇAĞLIYAN <busra.cagliyan@pardus.org.tr>  Tue, 29 Jul 2025 10:17:10 +0300
+
 libpardus-domain-joiner (0.1.1) yirmiuc; urgency=medium
 
   [ Emin Fedar ]
