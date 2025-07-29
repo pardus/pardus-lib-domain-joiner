@@ -5,7 +5,6 @@ import subprocess
 
 
 def set_hostname(comp_name):
-    backup_config_file("/etc/hosts", "/etc/hosts.old")
     backup_config_file("/etc/hostname", "/etc/hostname.old")
     update_hosts_file(comp_name)
     subprocess.call(["hostnamectl", "hostname", comp_name])
