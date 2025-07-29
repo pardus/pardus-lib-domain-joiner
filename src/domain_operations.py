@@ -25,7 +25,7 @@ def get_netbios_name(domain):
     for line in lines:
         if "GROUP" in line:
             netbios = line.strip().split("<")[0]
-            return netbios
+            return netbios.strip()
 
     return netbios
 
