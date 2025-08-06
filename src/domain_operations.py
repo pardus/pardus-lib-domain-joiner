@@ -17,6 +17,7 @@ def discover_domain(domain):
 
     return ""
 
+
 def get_netbios_name(domain):
     result = subprocess.run(["nmblookup", "-A", domain], text=True, capture_output=True)
     netbios = ""
@@ -28,6 +29,7 @@ def get_netbios_name(domain):
             return netbios.strip()
 
     return netbios
+
 
 def eprint(msg):
     print(msg, file=sys.stderr, flush=True)
@@ -154,14 +156,13 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
 
         if process.returncode == 0 and "Joined" in process.stdout:
             subprocess.run(
-                [
-                    "systemctl",
-                    "restart",
-                    "smbd.service",
-                    "nmbd.service",
-                    "winbind.service",
-                ],
-                capture_output=True,
+                ["systemctl", "restart", "smbd.service"], capture_output=True
+            )
+            subprocess.run(
+                ["systemctl", "restart", "nmbd.service"], capture_output=True
+            )
+            subprocess.run(
+                ["systemctl", "restart", "winbind.service"], capture_output=True
             )
 
             p = domain_joiner_winbind.domain_info()
@@ -188,7 +189,16 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
     fail_and_exit("")
 
 
-def join(comp_name, domain, user, passwd, ouaddress=None, workgroup=None, realmd=None, winbind=None):
+def join(
+    comp_name,
+    domain,
+    user,
+    passwd,
+    ouaddress=None,
+    workgroup=None,
+    realmd=None,
+    winbind=None,
+):
     try:
         # ouaddress = check_ouaddress(ouaddress, domain)
         if realmd:

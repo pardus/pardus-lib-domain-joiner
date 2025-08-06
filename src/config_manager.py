@@ -145,6 +145,8 @@ def rewrite_conf(file, settings):
     with open(file, "w") as configfile:
         config.write(configfile)
 
+    os.chmod(file, 0o755)
+
 
 def update_samba_conf_for_sssd(domain):
     smb_file = "/etc/samba/smb.conf"
