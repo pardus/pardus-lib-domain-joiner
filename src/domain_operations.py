@@ -140,8 +140,8 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
 
         p_discover = domain_joiner_winbind.discover()
         if p_discover.returncode != 0:
-            print("stdout:", p_discover.stdout, flush=True)
-            eprint("stderr:" + p_discover.stderr)
+            print("discover stdout:", p_discover.stdout, flush=True)
+            eprint("discover stderr:" + p_discover.stderr)
             restore_config_file(restore_files)
             fail_and_exit("Couldn't discovered the domain")
 
@@ -166,21 +166,18 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
             )
 
             p = domain_joiner_winbind.domain_info()
-            print("domain_info process code:", p.returncode, flush=True)
-            print("domain_info process stdout:", p.stdout, flush=True)
-            print("domain_info process stderr:", p.stderr, flush=True)
-
             if p.returncode == 0 and p.stdout:
                 print("This computer has been successfully added to the domain.")
                 return
             else:
-                print("stdout:", p.stdout, flush=True)
-                eprint("stderr:" + p.stderr)
+                print("domain_info exit code:", p.returncode, flush=True)
+                print("domain_info stdout:", p.stdout, flush=True)
+                eprint("domain_info stderr:" + p.stderr)
 
         # Not joined:
         eprint("Joining domain failed.")
-        print("stdout:", process.stdout, flush=True)
-        eprint("stderr:" + process.stderr)
+        print("winbind.join stdout:", process.stdout, flush=True)
+        eprint("winbind.join stderr:" + process.stderr)
 
     except Exception as e:
         eprint("Error" + f":{e}")

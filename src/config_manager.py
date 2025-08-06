@@ -145,8 +145,6 @@ def rewrite_conf(file, settings):
     with open(file, "w") as configfile:
         config.write(configfile)
 
-    os.chmod(file, 0o755)
-
 
 def update_samba_conf_for_sssd(domain):
     smb_file = "/etc/samba/smb.conf"
@@ -199,7 +197,8 @@ def update_sssd_conf(domain):
     }
     print("Updating /etc/sssd/sssd.conf file...")
     rewrite_conf(sssd_file, sssd_settings)
-    os.chmod(sssd_file, 600)
+    os.chmod(sssd_file, 0o600)  # -rw------
+    os.chown(sssd_file, 0, 0)  # root:root
     subprocess.call(["systemctl", "restart", "sssd.service"])
     print("Updated /etc/sssd/sssd.conf file...")
 
@@ -239,6 +238,7 @@ def update_samba_conf_for_winbind(domain, workgroup):
     }
     print("Updating /etc/samba/smb.conf file for winbind...")
     rewrite_conf(smb_file, samba_settings)
+    os.chmod(smb_file, 0o755)
     print("Updated /etc/samba/smb.conf file for winbind...")
 
 
