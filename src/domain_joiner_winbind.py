@@ -1,6 +1,6 @@
 import subprocess
 
-TIMEOUT = "3"
+TIMEOUT = "7"
 
 
 def discover():
