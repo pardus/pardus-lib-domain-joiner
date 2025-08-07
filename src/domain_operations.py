@@ -17,6 +17,7 @@ def discover_domain(domain):
 
     return ""
 
+
 def get_netbios_name(domain):
     result = subprocess.run(["nmblookup", "-A", domain], text=True, capture_output=True)
     netbios = ""
@@ -28,6 +29,7 @@ def get_netbios_name(domain):
             return netbios.strip()
 
     return netbios
+
 
 def eprint(msg):
     print(msg, file=sys.stderr, flush=True)
@@ -138,8 +140,8 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
 
         p_discover = domain_joiner_winbind.discover()
         if p_discover.returncode != 0:
-            print("stdout:", p_discover.stdout, flush=True)
-            eprint("stderr:" + p_discover.stderr)
+            print("discover stdout:", p_discover.stdout, flush=True)
+            eprint("discover stderr:" + p_discover.stderr)
             restore_config_file(restore_files)
             fail_and_exit("Couldn't discovered the domain")
 
@@ -154,32 +156,28 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
 
         if process.returncode == 0 and "Joined" in process.stdout:
             subprocess.run(
-                [
-                    "systemctl",
-                    "restart",
-                    "smbd.service",
-                    "nmbd.service",
-                    "winbind.service",
-                ],
-                capture_output=True,
+                ["systemctl", "restart", "smbd.service"], capture_output=True
+            )
+            subprocess.run(
+                ["systemctl", "restart", "nmbd.service"], capture_output=True
+            )
+            subprocess.run(
+                ["systemctl", "restart", "winbind.service"], capture_output=True
             )
 
             p = domain_joiner_winbind.domain_info()
-            print("domain_info process code:", p.returncode, flush=True)
-            print("domain_info process stdout:", p.stdout, flush=True)
-            print("domain_info process stderr:", p.stderr, flush=True)
-
             if p.returncode == 0 and p.stdout:
                 print("This computer has been successfully added to the domain.")
                 return
             else:
-                print("stdout:", p.stdout, flush=True)
-                eprint("stderr:" + p.stderr)
+                print("domain_info exit code:", p.returncode, flush=True)
+                print("domain_info stdout:", p.stdout, flush=True)
+                eprint("domain_info stderr:" + p.stderr)
 
         # Not joined:
         eprint("Joining domain failed.")
-        print("stdout:", process.stdout, flush=True)
-        eprint("stderr:" + process.stderr)
+        print("winbind.join stdout:", process.stdout, flush=True)
+        eprint("winbind.join stderr:" + process.stderr)
 
     except Exception as e:
         eprint("Error" + f":{e}")
@@ -188,7 +186,16 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
     fail_and_exit("")
 
 
-def join(comp_name, domain, user, passwd, ouaddress=None, workgroup=None, realmd=None, winbind=None):
+def join(
+    comp_name,
+    domain,
+    user,
+    passwd,
+    ouaddress=None,
+    workgroup=None,
+    realmd=None,
+    winbind=None,
+):
     try:
         # ouaddress = check_ouaddress(ouaddress, domain)
         if realmd:
