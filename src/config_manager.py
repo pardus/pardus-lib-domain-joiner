@@ -2,20 +2,28 @@ import configparser
 import os
 import shutil
 import subprocess
+import re
 
+
+def valid_hostname(hostname):
+    pattern = re.compile(r"^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$")
+    return bool(pattern.match(hostname))
 
 def set_hostname(comp_name):
-    backup_config_file("/etc/hostname", "/etc/hostname.old")
-    update_hosts_file(comp_name)
-    subprocess.call(["hostnamectl", "hostname", comp_name])
-    print("Changed hostname: ", comp_name)
+    if valid_hostname(comp_name):
+        backup_config_file("/etc/hostname", "/etc/hostname.old")
+        update_hosts_file(comp_name)
+        subprocess.call(["hostnamectl", "set-hostname", comp_name])
+        print("Changed hostname: ", comp_name)
+    else:
+        print("ERROR: You entered an invalid hostname.")
 
 
 def restore_hostname():
     if os.path.isfile("/etc/hostname.old"):
         with open("/etc/hostname.old", "r") as f:
             comp_name = f.read()
-        subprocess.call(["hostnamectl", "hostname", comp_name])
+        subprocess.call(["hostnamectl", "set-hostname", comp_name])
         print("Restored hostname file: ", comp_name)
         restore_config_file("/etc/hosts.old", "/etc/hosts")
 
@@ -76,10 +84,11 @@ def update_hostname_file(comp_name, domain=None):
         current_hostname = file.readline().strip()
         print("Checking /etc/hostname file...")
         if full_hostname not in current_hostname:
+            subprocess.call(["hostnamectl", "set-hostname", full_hostname])
             print("Added domain name to /etc/hostname file")
-            with open(hostname_file, "w") as file:
+            """with open(hostname_file, "w") as file:
                 new_hostname = f"{full_hostname}"
-                file.write(new_hostname)
+                file.write(new_hostname)"""
         else:
             print("Done")
 
