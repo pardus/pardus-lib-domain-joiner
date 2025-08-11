@@ -15,7 +15,7 @@ def join(user, password, ouaddress):
     join_command = ["net", "ads", "join", "-v", "-U", user]
 
     if ouaddress:
-        ou = f'createcomputer="{ouaddress}"'
+        ou = f'-OU="{ouaddress}"'
         join_command = ["net", "ads", "join", "-v", "-U", user, ou]
     return subprocess.run(join_command, input=password, text=True, capture_output=True)
 

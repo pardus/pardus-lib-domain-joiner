@@ -48,10 +48,18 @@ def restore_config_file(restore_files):
 
 
 def format_ou_dn(ouaddress, domain):
+    ou_upper = ouaddress.upper()
+    domain_upper = domain.upper()
+    domain_dn = "DC=" + domain_upper.replace(".", ",DC=")
+
     if ouaddress:
-        fulldn = ",DC=" + domain.replace(".", ",DC=")
-        ou = f"OU={ouaddress}" + fulldn
-        return ou
+        if "CN=" in ou_upper :
+            if domain_dn in ou_upper:
+                return ouaddress
+            else:
+                print("The domain name is written incorrectly.")
+
+    print("You wrote it in the wrong format. It should be like the example; CN=ou1,CN=ou2,DC=,DC=name..")
     return None
 
 
@@ -149,6 +157,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
         config_manager.update_hostname_file(comp_name, domain)
         config_manager.update_hosts_file(comp_name, domain)
 
+        ouaddress = format_ou_dn(ouaddress, domain)
         process = domain_joiner_winbind.join(user, passwd, ouaddress)
         print("winbind process code:", process.returncode, flush=True)
         print("winbind process stdout:", process.stdout, flush=True)
