@@ -92,7 +92,8 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         sssd_file_backup = "/etc/sssd/sssd.conf.old"
         config_manager.backup_config_file(sssd_file, sssd_file_backup)
 
-        ouaddress = format_ou_dn(ouaddress, domain)
+        if ouaddress:
+            ouaddress = format_ou_dn(ouaddress, domain)
 
         process = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
         if process.returncode == 0:
@@ -157,7 +158,9 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
         config_manager.update_hostname_file(comp_name, domain)
         config_manager.update_hosts_file(comp_name, domain)
 
-        ouaddress = format_ou_dn(ouaddress, domain)
+        if ouaddress:
+            ouaddress = format_ou_dn(ouaddress, domain)
+
         process = domain_joiner_winbind.join(user, passwd, ouaddress)
         print("winbind process code:", process.returncode, flush=True)
         print("winbind process stdout:", process.stdout, flush=True)
