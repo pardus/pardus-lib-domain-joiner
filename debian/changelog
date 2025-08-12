@@ -1,3 +1,20 @@
+libpardus-domain-joiner (0.1.3) yirmiuc; urgency=medium
+
+  [ Emin Fedar ]
+  * feat: separate service restarts & chmod file after write
+  * fix: typo whitespace
+  * fix: added -k to join
+  * fix: permissions
+  * fix: increase timeout 3 -> 7
+  * feat: remove -k
+
+  [ busra ]
+  * update ou format
+  * add hostname validation
+  * fix: skip ou address if not provided
+
+ -- Büşra ÇAĞLIYAN <busra.cagliyan@pardus.org.tr>  Tue, 12 Aug 2025 06:40:50 +0300
+
 libpardus-domain-joiner (0.1.2) yirmiuc; urgency=medium
 
   [ busra ]
