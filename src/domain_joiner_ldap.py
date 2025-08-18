@@ -3,9 +3,9 @@ import ldap
 
 class LDAP:
     def __init__(self, address, username, password):
-        self.address = address
-        self.username = username
-        self.password = password
+        self.address = address      # domain name or ip
+        self.username = username    # user@domain.name
+        self.password = password    # password
         self.conn = None
 
     def _connect(self):
