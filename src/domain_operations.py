@@ -47,20 +47,29 @@ def restore_config_file(restore_files):
             config_manager.restore_config_file(backup, original)
 
 
-def format_ou_dn(ouaddress, domain):
-    ou_upper = ouaddress.upper()
-    domain_upper = domain.upper()
-    domain_dn = "DC=" + domain_upper.replace(".", ",DC=")
+def format_ou_for_sssd(ouaddress, domain):
+    if "/" in ouaddress:
+        ou_parts = ouaddress.split("/")
+        ou_dn = ""
+        for p in reversed(ou_parts):
+            ou_dn += f"OU={p},"
+        domain_dn = "DC=" + domain.replace(".", ",DC=")
+        ouaddress = ou_dn + domain_dn
+        return ouaddress
 
-    if ouaddress:
-        if "CN=" in ou_upper :
-            if domain_dn in ou_upper:
-                return ouaddress
-            else:
-                print("The domain name is written incorrectly.")
+    if "," in ouaddress:
+        if "CN" in ouaddress:
+            ouaddress = ouaddress.replace("CN", "OU")
+            return ouaddress
+    return ouaddress
 
-    print("You wrote it in the wrong format. It should be like the example; CN=ou1,CN=ou2,DC=,DC=name..")
-    return None
+
+def format_ou_for_winbind(ouaddress):
+    if "/" in ouaddress or ouaddress.startswith("OU="):
+        return ouaddress
+    elif ouaddress.startswith("CN="):
+        ouaddress = ouaddress.replace("CN", "OU")
+        return ouaddress
 
 
 def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
@@ -93,7 +102,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         config_manager.backup_config_file(sssd_file, sssd_file_backup)
 
         if ouaddress:
-            ouaddress = format_ou_dn(ouaddress, domain)
+            ouaddress = format_ou_for_sssd(ouaddress, domain)
 
         process = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
         if process.returncode == 0:
@@ -159,7 +168,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
         config_manager.update_hosts_file(comp_name, domain)
 
         if ouaddress:
-            ouaddress = format_ou_dn(ouaddress, domain)
+            ouaddress = format_ou_for_winbind(ouaddress)
 
         process = domain_joiner_winbind.join(user, passwd, ouaddress)
         print("winbind process code:", process.returncode, flush=True)
