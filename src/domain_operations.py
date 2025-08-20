@@ -6,6 +6,7 @@ from pardus_domain_joiner import domain_joiner_realmd
 from pardus_domain_joiner import domain_joiner_winbind
 from pardus_domain_joiner import config_manager
 from pardus_domain_joiner import update_krb5_config
+from pardus_domain_joiner import domain_joiner_ldap
 
 
 def discover_domain(domain):
@@ -285,3 +286,8 @@ def list(realmd=None, winbind=None):
                     realm_name = line.split(":")[1].strip()
                     return realm_name
     return ""
+
+def check_hostname_in_ad(domain, computer, user, password):
+    ldap_user = f"{user}@{domain.upper()}"
+    ldap_check = domain_joiner_ldap.LDAP(domain, ldap_user, password)
+    return not ldap_check.check_computer_exists_in_ad(computer)
