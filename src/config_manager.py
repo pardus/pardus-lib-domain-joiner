@@ -7,7 +7,6 @@ from datetime import datetime
 
 # to backup files
 backup_dir = "/usr/share/pardus_domain_joiner/backups"
-os.makedirs(backup_dir, exist_ok=True)
 
 
 def valid_hostname(hostname):
@@ -54,6 +53,7 @@ def start_winbind_service():
 # backup config files before editing them
 def backup_config_file(source_file, backup_name):
     # backup_time = datetime.now().strftime("%y.%m.%d-%H.%M")
+    os.makedirs(backup_dir, exist_ok=True)
     backup_file = os.path.join(backup_dir, backup_name)
     if os.path.exists(source_file):
         try:
