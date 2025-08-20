@@ -42,9 +42,8 @@ def fail_and_exit(msg):
 
 
 def restore_config_file(restore_files):
-    for backup, original in restore_files.items():
-        if os.path.exists(backup):
-            config_manager.restore_config_file(backup, original)
+    for backup_name, original in restore_files.items():
+        config_manager.restore_config_file(backup_name, original)
 
 
 def format_ou_for_sssd(ouaddress, domain):
@@ -74,8 +73,8 @@ def format_ou_for_winbind(ouaddress):
 
 def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     restore_files = {
-        "/etc/hosts.old": "/etc/hosts",
-        "/etc/sssd/sssd.conf.old": "/etc/sssd/sssd.conf",
+        "krb5": "/etc/krb5.conf",
+        "sssd": "/etc/sssd/sssd.conf"
     }
 
     if not os.path.isfile("/etc/krb5.conf"):
@@ -98,8 +97,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
 
         # If there is a sssd file, take a backup.
         sssd_file = "/etc/sssd/sssd.conf"
-        sssd_file_backup = "/etc/sssd/sssd.conf.old"
-        config_manager.backup_config_file(sssd_file, sssd_file_backup)
+        config_manager.backup_config_file(sssd_file, "sssd")
 
         if ouaddress:
             ouaddress = format_ou_for_sssd(ouaddress, domain)
@@ -136,11 +134,9 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
 
 def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
     restore_files = {
-        "/etc/krb5.conf.old": "/etc/krb5.conf",
-        "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
-        "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
-        "/etc/hosts.old": "/etc/hosts",
-        "/etc/hostname.old": "/etc/hostname",
+        "krb5": "/etc/krb5.conf",
+        "samba-winbind": "/etc/samba/smb.conf",
+        "nsswitch": "/etc/nsswitch.conf",
     }
 
     found_domain = discover_domain(domain)
@@ -152,6 +148,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
 
     try:
         print("Updating /etc/krb5.conf file...")
+        config_manager.backup_config_file("/etc/krb5.conf","krb5")
         update_krb5_config.update_krb5_conf(domain)
         print("Updated /etc/krb5.conf file...")
         config_manager.update_samba_conf_for_winbind(domain, workgroup)
@@ -239,13 +236,12 @@ def join(
         print("An error occurred during the join process:", e.stderr)
 
 
-def leave(realmd=None, winbind=None, user=None, password=None):
+def leave(user, password, realmd=None, winbind=None):
     restore_files = {
-        "/etc/hosts.old": "/etc/hosts",
-        "/etc/hostname.old": "/etc/hostname",
-        "/etc/krb5.conf.old": "/etc/krb5.conf",
-        "/etc/nsswitch.conf.old": "/etc/nsswitch.conf",
-        "/etc/samba/smb.conf.old": "/etc/samba/smb.conf",
+        "krb5": "/etc/krb5.conf",
+        "sssd": "/etc/sssd/sssd.conf",
+        "nsswitch": "/etc/nsswitch.conf",
+        "samba-winbind": "/etc/samba/smb.conf",
     }
 
     if not realmd and not winbind:
@@ -256,6 +252,9 @@ def leave(realmd=None, winbind=None, user=None, password=None):
         p = domain_joiner_realmd.leave(user, password)
     elif winbind:
         p = domain_joiner_winbind.leave(user, password)
+
+    restore_config_file(restore_files)
+    config_manager.restore_hostname()
 
     # Success
     print(p.stdout, flush=True)

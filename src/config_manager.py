@@ -3,6 +3,11 @@ import os
 import shutil
 import subprocess
 import re
+from datetime import datetime
+
+# to backup files
+backup_dir = "/usr/share/pardus_domain_joiner/backups"
+os.makedirs(backup_dir, exist_ok=True)
 
 
 def valid_hostname(hostname):
@@ -11,21 +16,23 @@ def valid_hostname(hostname):
 
 def set_hostname(comp_name):
     if valid_hostname(comp_name):
-        backup_config_file("/etc/hostname", "/etc/hostname.old")
+        backup_config_file("/etc/hostname", "hostname")
         update_hosts_file(comp_name)
-        subprocess.call(["hostnamectl", "set-hostname", comp_name])
+        subprocess.call(["hostnamectl", "hostname", comp_name])
         print("Changed hostname: ", comp_name)
     else:
         print("ERROR: You entered an invalid hostname.")
 
 
 def restore_hostname():
-    if os.path.isfile("/etc/hostname.old"):
-        with open("/etc/hostname.old", "r") as f:
+    backup_hostname = os.path.join(backup_dir, "hostname")
+    if os.path.exists(backup_hostname):
+        with open(backup_hostname, "r") as f:
             comp_name = f.read()
-        subprocess.call(["hostnamectl", "set-hostname", comp_name])
+        subprocess.call(["hostnamectl", "hostname", comp_name])
         print("Restored hostname file: ", comp_name)
-        restore_config_file("/etc/hosts.old", "/etc/hosts")
+        restore_config_file("hosts", "/etc/hosts")
+        restore_config_file("hostname", "/etc/hostname")
 
 
 def start_sssd_service():
@@ -45,7 +52,9 @@ def start_winbind_service():
 
 
 # backup config files before editing them
-def backup_config_file(source_file, backup_file):
+def backup_config_file(source_file, backup_name):
+    # backup_time = datetime.now().strftime("%y.%m.%d-%H.%M")
+    backup_file = os.path.join(backup_dir, backup_name)
     if os.path.exists(source_file):
         try:
             shutil.copy2(source_file, backup_file)
@@ -56,8 +65,32 @@ def backup_config_file(source_file, backup_file):
         print(f"There is no such file: {source_file}.")
 
 
+"""def get_latest_backup(target_file):
+    all_files = os.listdir(backup_dir)
+    matching_backups = [
+        f for f in all_files
+        if f.endswith("-" + target_file)
+    ]
+
+    print("matching_backups", matching_backups)
+
+    if not matching_backups:
+        return None
+
+    matching_backups.sort()
+    latest_backup_name = matching_backups[-1]
+    latest_backup_path = os.path.join(backup_dir, latest_backup_name)
+
+    return latest_backup_path"""
+
+
 # to restore edited config files
-def restore_config_file(backup_file, source_file):
+def restore_config_file(backup_name, source_file):
+    backup_file = os.path.join(backup_dir, backup_name)
+    if not backup_file or not os.path.exists(backup_file):
+        print(f"No backup found for {backup_file}")
+        return
+
     if os.path.exists(source_file):
         try:
             shutil.copy2(backup_file, source_file)
@@ -75,8 +108,7 @@ def restore_config_file(backup_file, source_file):
 def update_hostname_file(comp_name, domain=None):
     # to check file /etc/hostname
     hostname_file = "/etc/hostname"
-    hostname_file_backup = "/etc/hostname.old"
-    backup_config_file(hostname_file, hostname_file_backup)
+    backup_config_file(hostname_file, "hostname")
 
     full_hostname = f"{comp_name}.{domain}" if domain else comp_name
 
@@ -96,13 +128,12 @@ def update_hostname_file(comp_name, domain=None):
 def update_hosts_file(comp_name, domain=None):
     # to check file /etc/hosts
     hosts_file = "/etc/hosts"
-    hosts_file_backup = "/etc/hosts.old"
 
     if not os.path.isfile(hosts_file):
         print("/etc/hosts not found.")
         return False
 
-    backup_config_file(hosts_file, hosts_file_backup)
+    backup_config_file(hosts_file, "hosts")
 
     with open(hosts_file, "r") as file:
         lines = file.readlines()
@@ -157,8 +188,7 @@ def rewrite_conf(file, settings):
 
 def update_samba_conf_for_sssd(domain):
     smb_file = "/etc/samba/smb.conf"
-    smb_file_backup = "/etc/samba/smb.conf.old"
-    backup_config_file(smb_file, smb_file_backup)
+    backup_config_file(smb_file, "samba-sssd")
     samba_settings = {
         "global": {
             "unix charset": "UTF-8",
@@ -214,8 +244,7 @@ def update_sssd_conf(domain):
 
 def update_samba_conf_for_winbind(domain, workgroup):
     smb_file = "/etc/samba/smb.conf"
-    smb_file_backup = "/etc/samba/smb.conf.old"
-    backup_config_file(smb_file, smb_file_backup)
+    backup_config_file(smb_file, "samba-winbind")
 
     samba_settings = {
         "global": {
@@ -253,8 +282,7 @@ def update_samba_conf_for_winbind(domain, workgroup):
 
 def update_nsswitch_conf():
     nsswitch_file = "/etc/nsswitch.conf"
-    nsswitch_file_backup = "/etc/nsswitch.conf.old"
-    backup_config_file(nsswitch_file, nsswitch_file_backup)
+    backup_config_file(nsswitch_file, "nsswitch")
 
     keys = ["passwd", "group", "shadow"]
 
