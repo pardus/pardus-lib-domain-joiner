@@ -25,7 +25,7 @@ class LDAP:
 
         try:
             self.conn.simple_bind_s(self.username, self.password)
-            print("LDAP authentication successful!")
+            # print("LDAP authentication successful!")
             return True
         except ldap.LDAPError as e:
             print(f"LDAP error: {e}")
@@ -49,14 +49,12 @@ class LDAP:
             if result:
                 for dn, entry in result:
                     if dn and entry:
-                        print(
-                            f"Hostname {hostname} already exists in Active Directory!"
-                        )
+                        # print(f"Hostname {hostname} already exists in Active Directory!")
                         # print(f"Found dn: {dn}")
                         # print(f"Found entry: {entry}")
                         return entry
                     else:
-                        print(f"Hostname {hostname} is available to use.")
+                        # print(f"Hostname {hostname} is available to use.")
                         return None
         except ldap.LDAPError as e:
             print(f"LDAP search failed: {e}")
@@ -73,4 +71,4 @@ class LDAP:
         """Close the LDAP connection."""
         if self.conn:
             self.conn.unbind_s()
-            print("Connection closed.")
+            # print("Connection closed.")
