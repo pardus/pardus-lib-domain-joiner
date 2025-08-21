@@ -290,4 +290,4 @@ def list(realmd=None, winbind=None):
 def check_hostname_in_ad(domain, computer, user, password):
     ldap_user = f"{user}@{domain.upper()}"
     ldap_check = domain_joiner_ldap.LDAP(domain, ldap_user, password)
-    return not ldap_check.check_computer_exists_in_ad(computer)
+    return ldap_check.check_computer_exists_in_ad(computer)
