@@ -6,7 +6,6 @@ from pardus_domain_joiner import domain_joiner_realmd
 from pardus_domain_joiner import domain_joiner_winbind
 from pardus_domain_joiner import config_manager
 from pardus_domain_joiner import update_krb5_config
-from pardus_domain_joiner import domain_joiner_ldap
 
 
 def discover_domain(domain):
@@ -73,10 +72,7 @@ def format_ou_for_winbind(ouaddress):
 
 
 def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
-    restore_files = {
-        "krb5": "/etc/krb5.conf",
-        "sssd": "/etc/sssd/sssd.conf"
-    }
+    restore_files = {"krb5": "/etc/krb5.conf", "sssd": "/etc/sssd/sssd.conf"}
 
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
@@ -149,7 +145,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
 
     try:
         print("Updating /etc/krb5.conf file...")
-        config_manager.backup_config_file("/etc/krb5.conf","krb5")
+        config_manager.backup_config_file("/etc/krb5.conf", "krb5")
         update_krb5_config.update_krb5_conf(domain)
         print("Updated /etc/krb5.conf file...")
         config_manager.update_samba_conf_for_winbind(domain, workgroup)
@@ -286,8 +282,3 @@ def list(realmd=None, winbind=None):
                     realm_name = line.split(":")[1].strip()
                     return realm_name
     return ""
-
-def check_hostname_in_ad(domain, computer, user, password):
-    ldap_user = f"{user}@{domain.upper()}"
-    ldap_check = domain_joiner_ldap.LDAP(domain, ldap_user, password)
-    return ldap_check.check_computer_exists_in_ad(computer)

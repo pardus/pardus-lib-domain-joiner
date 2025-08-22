@@ -3,9 +3,9 @@ import ldap
 
 class LDAP:
     def __init__(self, address, username, password):
-        self.address = address      # domain name or ip
-        self.username = username    # user@domain.name
-        self.password = password    # password
+        self.address = address  # domain name or ip
+        self.username = username  # user@domain.name
+        self.password = password  # password
         self.conn = None
 
     def _connect(self):
@@ -36,9 +36,6 @@ class LDAP:
 
     def check_computer_exists_in_ad(self, hostname):
         """Check if the given hostname already exists in Active Directory."""
-        if not self.authenticate():
-            return False
-
         try:
             domain_controller = self._build_domain_controller()
             search_base = domain_controller
@@ -49,18 +46,12 @@ class LDAP:
             if result:
                 for dn, entry in result:
                     if dn and entry:
-                        # print(f"Hostname {hostname} already exists in Active Directory!")
-                        # print(f"Found dn: {dn}")
-                        # print(f"Found entry: {entry}")
-                        return entry
-                    else:
-                        # print(f"Hostname {hostname} is available to use.")
-                        return None
+                        return True  # Hostname still in AD
+
+            return False
         except ldap.LDAPError as e:
             print(f"LDAP search failed: {e}")
             return None
-        finally:
-            self._unbind_connection()
 
     def _build_domain_controller(self):
         """Build the domain controller string from the LDAP address."""
