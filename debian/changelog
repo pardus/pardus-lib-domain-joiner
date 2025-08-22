@@ -1,3 +1,14 @@
+libpardus-domain-joiner (0.1.5) yirmiuc; urgency=medium
+
+  [ busra ]
+  * move file creation to function
+  * remove not option
+
+  [ Emin Fedar ]
+  * fix: separate authenticate and check computer in ad
+
+ -- Büşra ÇAĞLIYAN <busra.cagliyan@pardus.org.tr>  Fri, 22 Aug 2025 09:09:56 +0300
+
 libpardus-domain-joiner (0.1.4) yirmiuc; urgency=medium
 
   [ busra ]
