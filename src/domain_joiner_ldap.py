@@ -23,16 +23,8 @@ class LDAP:
         if self.conn is None:
             self._connect()
 
-        try:
-            self.conn.simple_bind_s(self.username, self.password)
-            # print("LDAP authentication successful!")
-            return True
-        except ldap.LDAPError as e:
-            print(f"LDAP error: {e}")
-            return False
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            return False
+        self.conn.simple_bind_s(self.username, self.password)
+        # print("LDAP authentication successful!")
 
     def check_computer_exists_in_ad(self, hostname):
         """Check if the given hostname already exists in Active Directory."""
