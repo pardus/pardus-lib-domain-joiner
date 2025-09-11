@@ -46,29 +46,16 @@ def restore_config_file(restore_files):
         config_manager.restore_config_file(backup_name, original)
 
 
-def format_ou_for_sssd(ouaddress, domain):
-    if "/" in ouaddress:
-        ou_parts = ouaddress.split("/")
-        ou_dn = ""
-        for p in reversed(ou_parts):
-            ou_dn += f"OU={p},"
-        domain_dn = "DC=" + domain.replace(".", ",DC=")
-        ouaddress = ou_dn + domain_dn
-        return ouaddress
-
-    if "," in ouaddress:
-        if "CN" in ouaddress:
-            ouaddress = ouaddress.replace("CN", "OU")
-            return ouaddress
-    return ouaddress
+def format_ou_for_sssd(ouaddress):
+    if ouaddress.startswith("OU=") or ouaddress.startswith("CN="):
+        return True
+    return False
 
 
 def format_ou_for_winbind(ouaddress):
-    if "/" in ouaddress or ouaddress.startswith("OU="):
-        return ouaddress
-    elif ouaddress.startswith("CN="):
-        ouaddress = ouaddress.replace("CN", "OU")
-        return ouaddress
+    if "/" in ouaddress or ouaddress.startswith("OU=") or ouaddress.startswith("CN="):
+        return True
+    return False
 
 
 def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
@@ -96,8 +83,8 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         sssd_file = "/etc/sssd/sssd.conf"
         config_manager.backup_config_file(sssd_file, "sssd")
 
-        if ouaddress:
-            ouaddress = format_ou_for_sssd(ouaddress, domain)
+        if ouaddress and not format_ou_for_sssd(ouaddress):
+            print("Organizational Unit format not correct")
 
         process = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
         if process.returncode == 0:
@@ -161,8 +148,8 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
         config_manager.update_hostname_file(comp_name, domain)
         config_manager.update_hosts_file(comp_name, domain)
 
-        if ouaddress:
-            ouaddress = format_ou_for_winbind(ouaddress)
+        if ouaddress and not format_ou_for_winbind(ouaddress):
+            print("Organizational Unit format not correct")
 
         process = domain_joiner_winbind.join(user, passwd, ouaddress)
         print("winbind process code:", process.returncode, flush=True)
@@ -170,6 +157,8 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
         print("winbind process stderr:", process.stderr, flush=True)
 
         if process.returncode == 0 and "Joined" in process.stdout:
+            domain_user = f"{user}@{domain.upper()}"
+            subprocess.run(["kinit", domain_user], capture_output=True)
             subprocess.run(
                 ["systemctl", "restart", "smbd.service"], capture_output=True
             )
@@ -249,21 +238,24 @@ def leave(user, password, realmd=None, winbind=None):
         p = domain_joiner_realmd.leave(user, password)
     elif winbind:
         p = domain_joiner_winbind.leave(user, password)
-
-    restore_config_file(restore_files)
-    config_manager.restore_hostname()
+        subprocess.run(["systemctl", "restart", "winbind.service"], capture_output=True)
 
     # Success
     print(p.stdout, flush=True)
     eprint(p.stderr)
 
     if p.returncode == 0:
+        print("p.returncode", p.returncode)
+        restore_config_file(restore_files)
+        config_manager.restore_hostname()
         return
+    elif p.returncode != 0:
+        exit(p.returncode)
 
     # Failure
-    restore_config_file(restore_files)
-    config_manager.restore_hostname()
-    exit(p.returncode)
+    # restore_config_file(restore_files)
+    # config_manager.restore_hostname()
+    # exit(p.returncode)
 
 
 def list(realmd=None, winbind=None):
