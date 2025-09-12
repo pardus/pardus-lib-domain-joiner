@@ -1,3 +1,11 @@
+libpardus-domain-joiner (0.1.6) yirmiuc; urgency=medium
+
+  [ busra ]
+  * Remove unnecessary try-except blocks
+  * Update format ou func and allow adding ou with CN
+
+ -- Büşra ÇAĞLIYAN <busra.cagliyan@pardus.org.tr>  Fri, 12 Sep 2025 10:04:02 +0300
+
 libpardus-domain-joiner (0.1.5) yirmiuc; urgency=medium
 
   [ busra ]
