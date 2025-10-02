@@ -150,7 +150,7 @@ def update_hosts_file(comp_name, domain=None):
 
     for line in lines:
         if line.strip().startswith("127.0.1.1"):
-            if full_hostname not in line:
+            if full_hostname != line:
                 line = f"{new_entry}\n"
             updated = True
         new_hosts_file.append(line)
