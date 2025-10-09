@@ -27,7 +27,7 @@ def restore_hostname():
     backup_hostname = os.path.join(backup_dir, "hostname")
     if os.path.exists(backup_hostname):
         with open(backup_hostname, "r") as f:
-            comp_name = f.read()
+            comp_name = f.read().strip()
         subprocess.call(["hostnamectl", "hostname", comp_name])
         print("Restored hostname file: ", comp_name)
         restore_config_file("hosts", "/etc/hosts")
