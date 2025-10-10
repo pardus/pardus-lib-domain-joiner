@@ -107,6 +107,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
             eprint("Joining domain failed.")
             print("stdout:", process.stdout, flush=True)
             eprint("stderr:" + process.stderr + "\n")
+            return process.stderr
 
     except Exception as e:
         eprint("Error" + f":{e}")
@@ -182,6 +183,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
         eprint("Joining domain failed.")
         print("winbind.join stdout:", process.stdout, flush=True)
         eprint("winbind.join stderr:" + process.stderr)
+        return process.stdout
 
     except Exception as e:
         eprint("Error" + f":{e}")
@@ -206,12 +208,12 @@ def join(
             config_manager.start_sssd_service()
             subprocess.run(["pam-auth-update", "--enable", "sss"], capture_output=True)
 
-            handle_realmd_join(comp_name, domain, user, passwd, ouaddress)
+            return handle_realmd_join(comp_name, domain, user, passwd, ouaddress)
         elif winbind:
             config_manager.start_winbind_service()
             subprocess.run(["pam-auth-update", "--disable", "sss"], capture_output=True)
 
-            handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup)
+            return handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup)
         else:
             print(
                 "No domain join method selected. Please specify either realmd or winbind."
@@ -220,6 +222,7 @@ def join(
 
     except subprocess.CalledProcessError as e:
         print("An error occurred during the join process:", e.stderr)
+        return e.stderr
 
 
 def leave(user, password, realmd=None, winbind=None):
@@ -251,6 +254,7 @@ def leave(user, password, realmd=None, winbind=None):
         return
     elif p.returncode != 0:
         exit(p.returncode)
+        return p.stderr
 
     # Failure
     # restore_config_file(restore_files)
