@@ -35,10 +35,11 @@ def eprint(msg):
     print(msg, file=sys.stderr, flush=True)
 
 
-def fail_and_exit(msg):
+def fail_and_return(msg):
     print(msg, file=sys.stderr, flush=True)
     config_manager.restore_hostname()
-    sys.exit(1)
+
+    return msg
 
 
 def restore_config_file(restore_files):
@@ -61,64 +62,66 @@ def format_ou_for_winbind(ouaddress):
 def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     restore_files = {"krb5": "/etc/krb5.conf", "sssd": "/etc/sssd/sssd.conf"}
 
-    print("STEP===Discovering kerberos domain...", flush=True)
+    print("STEP===Discovering domain...", flush=True)
     if not os.path.isfile("/etc/krb5.conf"):
-        fail_and_exit("krb5.conf not found. Required packages might be missing.")
+        return fail_and_return(
+            "krb5.conf not found. Required packages might be missing."
+        )
 
     try:
         result = domain_joiner_realmd.discover(domain)
         if result:
             print("Domain discovered...")
         else:
-            fail_and_exit("Domain not found:" + f" '{domain}'")
+            return fail_and_return("Domain not found:" + f" '{domain}'")
 
     except subprocess.CalledProcessError as e:
         print("Error discovering domain. Exit Code:", e.returncode)
-        fail_and_exit("Domain discovery failed.")
+        return fail_and_return("Domain discovery failed.")
 
-    try:
-        # print("domain:", domain)
-        print("STEP===Backup configuration files...", flush=True)
+    print("STEP===Backup configuration files...", flush=True)
 
-        # If there is a sssd file, take a backup.
-        sssd_file = "/etc/sssd/sssd.conf"
-        config_manager.backup_config_file(sssd_file, "sssd")
+    # If there is a sssd file, take a backup.
+    sssd_file = "/etc/sssd/sssd.conf"
+    config_manager.backup_config_file(sssd_file, "sssd")
 
-        if ouaddress and not format_ou_for_sssd(ouaddress):
-            print("Organizational Unit format not correct")
+    if ouaddress and not format_ou_for_sssd(ouaddress):
+        print("Organizational Unit format not correct")
 
-        print("STEP===Joining the domain with sssd...", flush=True)
-        process = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
-        if process.returncode == 0:
-            print("STEP===Updating configuration files...", flush=True)
+    print("STEP===Joining the domain with sssd...", flush=True)
+    process = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
+    print("realmd process stdout:", process.stdout)
+    print("realmd process stderr:", process.stderr)
+    if process.returncode == 0:
+        print("STEP===Updating configuration files...", flush=True)
 
-            config_manager.update_hostname_file(comp_name, domain)
-            config_manager.update_hosts_file(comp_name, domain)
+        config_manager.update_hostname_file(comp_name, domain)
+        config_manager.update_hosts_file(comp_name, domain)
 
-            """if smb_settings:
-                config_manager.update_samba_conf_for_sssd(domain)"""
+        """if smb_settings:
+            config_manager.update_samba_conf_for_sssd(domain)"""
 
-            config_manager.update_sssd_conf(domain)
+        config_manager.update_sssd_conf(domain)
 
-            print("STEP===Enabling Pardus PAM Config...", flush=True)
-            subprocess.call(
-                ["pam-auth-update", "--enable", "pardus-pam-config"],
-                env={**os.environ, "DEBIAN_FRONTEND": "noninteractive"},
-            )
+        print("STEP===Enabling Pardus PAM Config...", flush=True)
+        subprocess.call(
+            ["pam-auth-update", "--enable", "pardus-pam-config"],
+            env={**os.environ, "DEBIAN_FRONTEND": "noninteractive"},
+        )
 
-            print("STEP===Success.", flush=True)
+        print("STEP===Success.", flush=True)
 
-            print("This computer has been successfully added to the domain.")
-            return
-
-    except Exception as e:
-        eprint("Error" + f":{e}")
+        print("This computer has been successfully added to the domain.")
+        return ""
 
     # Couldn't connect, restore settings
+    msg = fail_and_return(process.stderr)
+
     print(" ")
     print("=== Restoring Configuration Files from Backup ===")
     restore_config_file(restore_files)
-    fail_and_exit("Joining domain failed.")
+
+    return msg
 
 
 def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
@@ -131,78 +134,73 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
     print("STEP===Discovering the domain...", flush=True)
     found_domain = discover_domain(domain)
     if not found_domain:
-        fail_and_exit("Domain not found:" + f" '{domain}'")
+        return fail_and_return("Domain not found:" + f" '{domain}'")
 
-    print("STEP===Discovering kerberos domain...", flush=True)
     if not os.path.isfile("/etc/krb5.conf"):
-        fail_and_exit("krb5.conf not found. Required packages might be missing.")
+        return fail_and_return(
+            "krb5.conf not found. Required packages might be missing."
+        )
 
-    try:
-        print("Updating /etc/krb5.conf file...")
-        config_manager.backup_config_file("/etc/krb5.conf", "krb5")
-        update_krb5_config.update_krb5_conf(domain)
-        print("Updated /etc/krb5.conf file...")
-        config_manager.update_samba_conf_for_winbind(domain, workgroup)
+    print("Updating /etc/krb5.conf file...")
+    config_manager.backup_config_file("/etc/krb5.conf", "krb5")
+    update_krb5_config.update_krb5_conf(domain)
+    print("Updated /etc/krb5.conf file...")
+    config_manager.update_samba_conf_for_winbind(domain, workgroup)
 
-        p_discover = domain_joiner_winbind.discover()
-        if p_discover.returncode != 0:
-            print("discover stdout:", p_discover.stdout, flush=True)
-            eprint("discover stderr:" + p_discover.stderr)
-            restore_config_file(restore_files)
-            fail_and_exit("Couldn't discovered the domain")
+    p_discover = domain_joiner_winbind.discover()
+    if p_discover.returncode != 0:
+        print("discover stdout:", p_discover.stdout, flush=True)
+        eprint("discover stderr:" + p_discover.stderr)
+        restore_config_file(restore_files)
+        return fail_and_return("Couldn't discovered the domain")
 
-        print("STEP===Updating configuration files...", flush=True)
-        config_manager.update_nsswitch_conf()
-        config_manager.update_hostname_file(comp_name, domain)
-        config_manager.update_hosts_file(comp_name, domain)
+    print("STEP===Updating configuration files...", flush=True)
+    config_manager.update_nsswitch_conf()
+    config_manager.update_hostname_file(comp_name, domain)
+    config_manager.update_hosts_file(comp_name, domain)
 
-        if ouaddress and not format_ou_for_winbind(ouaddress):
-            print("Organizational Unit format not correct")
+    if ouaddress and not format_ou_for_winbind(ouaddress):
+        print("Organizational Unit format not correct")
 
-        print("STEP===Joining the domain with winbind...", flush=True)
-        process = domain_joiner_winbind.join(user, passwd, ouaddress)
-        eprint(process.stderr)
-        print(process.stdout, flush=True)
+    print("STEP===Joining the domain with winbind...", flush=True)
+    process = domain_joiner_winbind.join(user, passwd, ouaddress)
+    eprint(process.stderr)
+    print(process.stdout, flush=True)
 
-        if process.returncode == 0 and "Joined" in process.stdout:
-            domain_user = f"{user}@{domain.upper()}"
-            subprocess.run(["kinit", domain_user], capture_output=True)
-            subprocess.run(
-                ["systemctl", "restart", "smbd.service"], capture_output=True
+    if process.returncode == 0 and "Joined" in process.stdout:
+        domain_user = f"{user}@{domain.upper()}"
+        subprocess.run(["kinit", domain_user], capture_output=True)
+        subprocess.run(["systemctl", "restart", "smbd.service"], capture_output=True)
+        subprocess.run(["systemctl", "restart", "nmbd.service"], capture_output=True)
+        subprocess.run(["systemctl", "restart", "winbind.service"], capture_output=True)
+
+        p_domaininfo = domain_joiner_winbind.domain_info()
+        if p_domaininfo.returncode == 0:
+            print("This computer has been successfully added to the domain.")
+            return ""
+        else:
+            print(
+                "domain_joiner_winbind.domain_info exit code:",
+                p_domaininfo.returncode,
             )
-            subprocess.run(
-                ["systemctl", "restart", "nmbd.service"], capture_output=True
+            print(
+                "domain_joiner_winbind.domain_info stdout:",
+                p_domaininfo.stdout,
             )
-            subprocess.run(
-                ["systemctl", "restart", "winbind.service"], capture_output=True
+            print(
+                "domain_joiner_winbind.domain_info stderr:",
+                p_domaininfo.stderr,
+                flush=True,
             )
+            return fail_and_return(p_domaininfo.stdout)
 
-            p_domaininfo = domain_joiner_winbind.domain_info()
-            if p_domaininfo.returncode == 0:
-                print("This computer has been successfully added to the domain.")
-                return
-            else:
-                print(
-                    "domain_joiner_winbind.domain_info exit code:",
-                    p_domaininfo.returncode,
-                )
-                print(
-                    "domain_joiner_winbind.domain_info stdout:",
-                    p_domaininfo.stdout,
-                )
-                print(
-                    "domain_joiner_winbind.domain_info stderr:",
-                    p_domaininfo.stderr,
-                    flush=True,
-                )
-
-    except Exception as e:
-        eprint("Error" + f":{e}")
+    msg = fail_and_return(process.stdout)
 
     print(" ")
     print("=== Restoring Configuration Files from Backup ===")
     restore_config_file(restore_files)
-    fail_and_exit("")
+
+    return msg
 
 
 def join(
@@ -222,21 +220,20 @@ def join(
             config_manager.start_sssd_service()
             subprocess.run(["pam-auth-update", "--enable", "sss"], capture_output=True)
 
-            handle_realmd_join(comp_name, domain, user, passwd, ouaddress)
+            return handle_realmd_join(comp_name, domain, user, passwd, ouaddress)
         elif winbind:
             print("STEP===Starting winbind service...", flush=True)
             config_manager.start_winbind_service()
             subprocess.run(["pam-auth-update", "--disable", "sss"], capture_output=True)
 
-            handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup)
-        else:
-            print(
-                "No domain join method selected. Please specify either realmd or winbind."
+            return handle_winbind_join(
+                comp_name, domain, user, passwd, ouaddress, workgroup
             )
-            sys.exit(1)
+        else:
+            return "No domain join method selected. Please specify either realmd or winbind."
 
     except subprocess.CalledProcessError as e:
-        print("An error occurred during the join process:", e.stderr)
+        return f"An error occurred during the join process: {e.stderr}"
 
 
 def leave(user, password, realmd=None, winbind=None):
@@ -248,8 +245,7 @@ def leave(user, password, realmd=None, winbind=None):
     }
 
     if not realmd and not winbind:
-        eprint("Please provide connection type, realmd or winbind")
-        exit(1)
+        return fail_and_return("Please provide connection type, realmd or winbind")
 
     print("STEP===Leaving Started...", flush=True)
     if realmd:
@@ -264,9 +260,9 @@ def leave(user, password, realmd=None, winbind=None):
         print("STEP===Restoring configuration files...", flush=True)
         restore_config_file(restore_files)
         config_manager.restore_hostname()
-        return
+        return ""
 
-    exit(p.returncode)
+    return fail_and_return(p.stderr)
 
 
 def list(realmd=None, winbind=None):
