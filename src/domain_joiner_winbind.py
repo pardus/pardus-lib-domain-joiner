@@ -25,7 +25,6 @@ def leave(user, password):
         ["net", "ads", "leave", "-U", user],
         input=password,
         text=True,
-        capture_output=True,
     )
 
 

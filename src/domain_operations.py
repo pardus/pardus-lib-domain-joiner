@@ -61,6 +61,7 @@ def format_ou_for_winbind(ouaddress):
 def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     restore_files = {"krb5": "/etc/krb5.conf", "sssd": "/etc/sssd/sssd.conf"}
 
+    print("STEP===Discovering kerberos domain...", flush=True)
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
 
@@ -77,7 +78,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
 
     try:
         # print("domain:", domain)
-        print("Joining the domain...")
+        print("STEP===Backup configuration files...", flush=True)
 
         # If there is a sssd file, take a backup.
         sssd_file = "/etc/sssd/sssd.conf"
@@ -86,8 +87,11 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
         if ouaddress and not format_ou_for_sssd(ouaddress):
             print("Organizational Unit format not correct")
 
+        print("STEP===Joining the domain with sssd...", flush=True)
         process = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
         if process.returncode == 0:
+            print("STEP===Updating configuration files...", flush=True)
+
             config_manager.update_hostname_file(comp_name, domain)
             config_manager.update_hosts_file(comp_name, domain)
 
@@ -96,23 +100,23 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
 
             config_manager.update_sssd_conf(domain)
 
+            print("STEP===Enabling Pardus PAM Config...", flush=True)
             subprocess.call(
                 ["pam-auth-update", "--enable", "pardus-pam-config"],
                 env={**os.environ, "DEBIAN_FRONTEND": "noninteractive"},
             )
 
+            print("STEP===Success.", flush=True)
+
             print("This computer has been successfully added to the domain.")
             return
-        else:
-            eprint("Joining domain failed.")
-            print("stdout:", process.stdout, flush=True)
-            eprint("stderr:" + process.stderr + "\n")
-            return process.stderr
 
     except Exception as e:
         eprint("Error" + f":{e}")
 
     # Couldn't connect, restore settings
+    print(" ")
+    print("=== Restoring Configuration Files from Backup ===")
     restore_config_file(restore_files)
     fail_and_exit("Joining domain failed.")
 
@@ -124,10 +128,12 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
         "nsswitch": "/etc/nsswitch.conf",
     }
 
+    print("STEP===Discovering the domain...", flush=True)
     found_domain = discover_domain(domain)
     if not found_domain:
         fail_and_exit("Domain not found:" + f" '{domain}'")
 
+    print("STEP===Discovering kerberos domain...", flush=True)
     if not os.path.isfile("/etc/krb5.conf"):
         fail_and_exit("krb5.conf not found. Required packages might be missing.")
 
@@ -145,6 +151,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
             restore_config_file(restore_files)
             fail_and_exit("Couldn't discovered the domain")
 
+        print("STEP===Updating Configurations...", flush=True)
         config_manager.update_nsswitch_conf()
         config_manager.update_hostname_file(comp_name, domain)
         config_manager.update_hosts_file(comp_name, domain)
@@ -152,10 +159,10 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
         if ouaddress and not format_ou_for_winbind(ouaddress):
             print("Organizational Unit format not correct")
 
+        print("STEP===Joining the domain with winbind...", flush=True)
         process = domain_joiner_winbind.join(user, passwd, ouaddress)
-        print("winbind process code:", process.returncode, flush=True)
-        print("winbind process stdout:", process.stdout, flush=True)
-        print("winbind process stderr:", process.stderr, flush=True)
+        eprint(process.stderr)
+        print(process.stdout, flush=True)
 
         if process.returncode == 0 and "Joined" in process.stdout:
             domain_user = f"{user}@{domain.upper()}"
@@ -170,24 +177,30 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
                 ["systemctl", "restart", "winbind.service"], capture_output=True
             )
 
-            p = domain_joiner_winbind.domain_info()
-            if p.returncode == 0 and p.stdout:
+            p_domaininfo = domain_joiner_winbind.domain_info()
+            if p_domaininfo.returncode == 0:
                 print("This computer has been successfully added to the domain.")
                 return
             else:
-                print("domain_info exit code:", p.returncode, flush=True)
-                print("domain_info stdout:", p.stdout, flush=True)
-                eprint("domain_info stderr:" + p.stderr)
-
-        # Not joined:
-        eprint("Joining domain failed.")
-        print("winbind.join stdout:", process.stdout, flush=True)
-        eprint("winbind.join stderr:" + process.stderr)
-        return process.stdout
+                print(
+                    "domain_joiner_winbind.domain_info exit code:",
+                    p_domaininfo.returncode,
+                )
+                print(
+                    "domain_joiner_winbind.domain_info stdout:",
+                    p_domaininfo.stdout,
+                )
+                print(
+                    "domain_joiner_winbind.domain_info stderr:",
+                    p_domaininfo.stderr,
+                    flush=True,
+                )
 
     except Exception as e:
         eprint("Error" + f":{e}")
 
+    print(" ")
+    print("=== Restoring Configuration Files from Backup ===")
     restore_config_file(restore_files)
     fail_and_exit("")
 
@@ -205,15 +218,17 @@ def join(
     try:
         # ouaddress = check_ouaddress(ouaddress, domain)
         if realmd:
+            print("STEP===Starting sssd service...", flush=True)
             config_manager.start_sssd_service()
             subprocess.run(["pam-auth-update", "--enable", "sss"], capture_output=True)
 
-            return handle_realmd_join(comp_name, domain, user, passwd, ouaddress)
+            handle_realmd_join(comp_name, domain, user, passwd, ouaddress)
         elif winbind:
+            print("STEP===Starting winbind service...", flush=True)
             config_manager.start_winbind_service()
             subprocess.run(["pam-auth-update", "--disable", "sss"], capture_output=True)
 
-            return handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup)
+            handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup)
         else:
             print(
                 "No domain join method selected. Please specify either realmd or winbind."
@@ -222,7 +237,6 @@ def join(
 
     except subprocess.CalledProcessError as e:
         print("An error occurred during the join process:", e.stderr)
-        return e.stderr
 
 
 def leave(user, password, realmd=None, winbind=None):
@@ -237,29 +251,22 @@ def leave(user, password, realmd=None, winbind=None):
         eprint("Please provide connection type, realmd or winbind")
         exit(1)
 
+    print("STEP===Leaving Started...", flush=True)
     if realmd:
         p = domain_joiner_realmd.leave(user, password)
     elif winbind:
         p = domain_joiner_winbind.leave(user, password)
+        print("STEP===Restarting winbind service...", flush=True)
         subprocess.run(["systemctl", "restart", "winbind.service"], capture_output=True)
 
     # Success
-    print(p.stdout, flush=True)
-    eprint(p.stderr)
-
     if p.returncode == 0:
-        print("p.returncode", p.returncode)
+        print("STEP===Restoring configuration files...", flush=True)
         restore_config_file(restore_files)
         config_manager.restore_hostname()
         return
-    elif p.returncode != 0:
-        exit(p.returncode)
-        return p.stderr
 
-    # Failure
-    # restore_config_file(restore_files)
-    # config_manager.restore_hostname()
-    # exit(p.returncode)
+    exit(p.returncode)
 
 
 def list(realmd=None, winbind=None):
