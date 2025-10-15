@@ -151,7 +151,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
             restore_config_file(restore_files)
             fail_and_exit("Couldn't discovered the domain")
 
-        print("STEP===Updating Configurations...", flush=True)
+        print("STEP===Updating configuration files...", flush=True)
         config_manager.update_nsswitch_conf()
         config_manager.update_hostname_file(comp_name, domain)
         config_manager.update_hosts_file(comp_name, domain)
