@@ -1,3 +1,11 @@
+libpardus-domain-joiner (0.2.1) yirmiuc; urgency=medium
+
+  [ Emin Fedar ]
+  * fix: typo
+  * feat!: fail_and_exit -> fail_and_return mechanism
+
+ -- Büşra ÇAĞLIYAN <busra.cagliyan@pardus.org.tr>  Thu, 16 Oct 2025 10:02:56 +0300
+
 libpardus-domain-joiner (0.2.0) yirmiuc; urgency=medium
 
   [ busra ]
