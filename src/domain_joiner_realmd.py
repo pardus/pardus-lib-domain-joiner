@@ -27,10 +27,7 @@ def join(domain, user, passwd, ouaddress):
             domain.upper(),
         ]
 
-    # print(join_command)
-    process = subprocess.run(join_command, input=passwd, text=True, capture_output=True)
-
-    return process
+    return subprocess.run(join_command, input=passwd, text=True, capture_output=True)
 
 
 def leave(user, password):

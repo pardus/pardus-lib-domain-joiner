@@ -1,3 +1,15 @@
+libpardus-domain-joiner (0.2.0) yirmiuc; urgency=medium
+
+  [ busra ]
+  * Fix hostname check: use equality instead of substring match
+  * remove newline in hostname
+  * add return output to stdout and stderr
+
+  [ Emin Fedar ]
+  * feat: add steps on join & leave
+
+ -- Emin Fedar <emin.fedar@pardus.org.tr>  Wed, 15 Oct 2025 13:50:09 +0300
+
 libpardus-domain-joiner (0.1.6) yirmiuc; urgency=medium
 
   [ busra ]
