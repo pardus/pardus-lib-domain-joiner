@@ -19,3 +19,6 @@ py.install_sources(
   ],
   subdir: 'pardus_domain_joiner',
 )
+install_data(
+  'data/pardus-pam-config', install_dir:'/usr/share/pam-configs', rename:'pardus-domain-joiner'
+)
