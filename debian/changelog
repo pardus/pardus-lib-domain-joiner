@@ -1,3 +1,12 @@
+libpardus-domain-joiner (0.2.2) yirmiuc; urgency=medium
+
+  [ busra ]
+  * meson: add pam-config file
+  * refactor: use regex to validate OU format
+  * add automated kinit execution and service startup message
+
+ -- Büşra ÇAĞLIYAN <busra.cagliyan@pardus.org.tr>  Tue, 04 Nov 2025 10:34:47 +0300
+
 libpardus-domain-joiner (0.2.1) yirmiuc; urgency=medium
 
   [ Emin Fedar ]
