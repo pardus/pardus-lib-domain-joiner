@@ -171,10 +171,13 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
 
     if process.returncode == 0 and "Joined" in process.stdout:
         domain_user = f"{user}@{domain.upper()}"
-        subprocess.run(["kinit", domain_user], capture_output=True)
+        subprocess.run(["kinit", domain_user], input=passwd + '\n', text=True, capture_output=True)
+
+        print("Services are starting...", end="", flush=True)
         subprocess.run(["systemctl", "restart", "smbd.service"], capture_output=True)
         subprocess.run(["systemctl", "restart", "nmbd.service"], capture_output=True)
         subprocess.run(["systemctl", "restart", "winbind.service"], capture_output=True)
+        print("Done!")
 
         p_domaininfo = domain_joiner_winbind.domain_info()
         if p_domaininfo.returncode == 0:
