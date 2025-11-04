@@ -1,4 +1,5 @@
 import os
+import re
 import subprocess
 import sys
 
@@ -47,16 +48,15 @@ def restore_config_file(restore_files):
         config_manager.restore_config_file(backup_name, original)
 
 
-def format_ou_for_sssd(ouaddress):
-    if ouaddress.startswith("OU=") or ouaddress.startswith("CN="):
-        return True
-    return False
+def format_ou(ouaddress):
+    """Check if OU is a valid AD DN (e.g. OU=Users,DC=example,DC=com)."""
+    if not ouaddress:
+        return False
 
+    # Regex pattern to match a valid AD DN
+    pattern = r'^(OU|CN)=[^,]+(,OU=[^,]+)*,DC=[^,]+(,DC=[^,]+)*$'
 
-def format_ou_for_winbind(ouaddress):
-    if "/" in ouaddress or ouaddress.startswith("OU=") or ouaddress.startswith("CN="):
-        return True
-    return False
+    return re.match(pattern, ouaddress) is not None
 
 
 def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
@@ -85,8 +85,9 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     sssd_file = "/etc/sssd/sssd.conf"
     config_manager.backup_config_file(sssd_file, "sssd")
 
-    if ouaddress and not format_ou_for_sssd(ouaddress):
-        print("Organizational Unit format not correct")
+    if ouaddress and not format_ou(ouaddress):
+        print("Organizational Unit format not correct. Example: OU=Users,DC=example,DC=com")
+        sys.exit(1)
 
     print("STEP===Joining the domain with sssd...", flush=True)
     process = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
@@ -159,8 +160,9 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
     config_manager.update_hostname_file(comp_name, domain)
     config_manager.update_hosts_file(comp_name, domain)
 
-    if ouaddress and not format_ou_for_winbind(ouaddress):
-        print("Organizational Unit format not correct")
+    if ouaddress and not format_ou(ouaddress):
+        print("Organizational Unit format not correct. Example: OU=Users,DC=example,DC=com")
+        sys.exit(1)
 
     print("STEP===Joining the domain with winbind...", flush=True)
     process = domain_joiner_winbind.join(user, passwd, ouaddress)
