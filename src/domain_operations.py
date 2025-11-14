@@ -54,7 +54,7 @@ def format_ou(ouaddress):
         return False
 
     # Regex pattern to match a valid AD DN
-    pattern = r'^(OU|CN)=[^,]+(,OU=[^,]+)*,DC=[^,]+(,DC=[^,]+)*$'
+    pattern = r"^(OU|CN)=[^,]+(,OU=[^,]+)*,DC=[^,]+(,DC=[^,]+)*$"
 
     return re.match(pattern, ouaddress) is not None
 
@@ -85,9 +85,12 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     sssd_file = "/etc/sssd/sssd.conf"
     config_manager.backup_config_file(sssd_file, "sssd")
 
+    print("STEP===Organizational Unit format check...", flush=True)
+
     if ouaddress and not format_ou(ouaddress):
-        print("Organizational Unit format not correct. Example: OU=Users,DC=example,DC=com")
-        sys.exit(1)
+        print("Organizational Unit format is not correct.")
+        print("Example: OU=Users,DC=example,DC=com")
+        return fail_and_return("Organizational Unit format is not correct.")
 
     print("STEP===Joining the domain with sssd...", flush=True)
     process = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
@@ -160,9 +163,12 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
     config_manager.update_hostname_file(comp_name, domain)
     config_manager.update_hosts_file(comp_name, domain)
 
+    print("STEP===Organizational Unit format check...", flush=True)
+
     if ouaddress and not format_ou(ouaddress):
-        print("Organizational Unit format not correct. Example: OU=Users,DC=example,DC=com")
-        sys.exit(1)
+        print("Organizational Unit format is not correct.")
+        print("Example: OU=Users,DC=example,DC=com")
+        return fail_and_return("Organizational Unit format is not correct.")
 
     print("STEP===Joining the domain with winbind...", flush=True)
     process = domain_joiner_winbind.join(user, passwd, ouaddress)
@@ -171,7 +177,9 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
 
     if process.returncode == 0 and "Joined" in process.stdout:
         domain_user = f"{user}@{domain.upper()}"
-        subprocess.run(["kinit", domain_user], input=passwd + '\n', text=True, capture_output=True)
+        subprocess.run(
+            ["kinit", domain_user], input=passwd + "\n", text=True, capture_output=True
+        )
 
         print("Services are starting...", end="", flush=True)
         subprocess.run(["systemctl", "restart", "smbd.service"], capture_output=True)
