@@ -1,3 +1,10 @@
+libpardus-domain-joiner (0.2.3) yirmiuc; urgency=medium
+
+  [ Emin Fedar ]
+  * fix: better OU check and safely fail
+
+ -- Büşra ÇAĞLIYAN <busra.cagliyan@pardus.org.tr>  Fri, 14 Nov 2025 11:53:03 +0300
+
 libpardus-domain-joiner (0.2.2) yirmiuc; urgency=medium
 
   [ busra ]
