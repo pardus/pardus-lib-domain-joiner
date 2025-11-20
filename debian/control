@@ -1,4 +1,4 @@
-Source: libpardus-domain-joiner
+Source: pardus-lib-domain-joiner
 Section: utils
 Priority: optional
 Maintainer: Pardus Altyapı <altyapi@pardus.org.tr>
@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 12), meson
 Standards-Version: 4.6.1
 Homepage: https://www.pardus.org.tr
 
-Package: libpardus-domain-joiner
+Package: pardus-lib-domain-joiner
 Architecture: all
 Depends: ${misc:Depends},
          python3 (>=3.5),

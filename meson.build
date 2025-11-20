@@ -1,5 +1,5 @@
 project(
-  'libpardus-domain-joiner',
+  'pardus-lib-domain-joiner',
   version: '0.1.0',
   license: 'GPL-3.0+',
 )
