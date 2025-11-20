@@ -1,3 +1,10 @@
+pardus-lib-domain-joiner (0.2.4) yirmiuc; urgency=medium
+
+  [ busra ]
+  * refactor: rename application to pardus-lib-domain-joiner
+
+ -- Büşra ÇAĞLIYAN <busra.cagliyan@pardus.org.tr>  Thu, 20 Nov 2025 18:41:54 +0300
+
 libpardus-domain-joiner (0.2.3) yirmiuc; urgency=medium
 
   [ Emin Fedar ]
