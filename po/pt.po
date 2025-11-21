@@ -1,0 +1,188 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-21 15:47+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/config_manager.py:35
+msgid "Changed hostname: "
+msgstr ""
+
+#: src/config_manager.py:37
+msgid "ERROR: You entered an invalid hostname."
+msgstr ""
+
+#: src/config_manager.py:46
+msgid "Restored hostname file: "
+msgstr ""
+
+#: src/config_manager.py:52
+msgid "Starting sssd service..."
+msgstr ""
+
+#: src/config_manager.py:60
+msgid "Starting winbind service..."
+msgstr ""
+
+#: src/config_manager.py:77
+msgid "An error occurred while backing up {}. Error: {}"
+msgstr ""
+
+#: src/config_manager.py:79 src/config_manager.py:119
+msgid "There is no such file: {}."
+msgstr ""
+
+#: src/config_manager.py:105
+msgid "No backup found for "
+msgstr ""
+
+#: src/config_manager.py:111
+msgid "{} has been restored from backup."
+msgstr ""
+
+#: src/config_manager.py:117
+msgid "An error occurred while restoring {}. Error: {}"
+msgstr ""
+
+#: src/config_manager.py:131
+msgid "Checking /etc/hostname file..."
+msgstr ""
+
+#: src/config_manager.py:134
+msgid "Added domain name to /etc/hostname file"
+msgstr ""
+
+#: src/config_manager.py:139 src/config_manager.py:179
+msgid "Done"
+msgstr ""
+
+#: src/config_manager.py:147
+msgid "/etc/hosts not found."
+msgstr ""
+
+#: src/config_manager.py:155
+msgid "Checking /etc/hosts file..."
+msgstr ""
+
+#: src/config_manager.py:181
+msgid "Added hostname to /etc/hosts file"
+msgstr ""
+
+#: src/config_manager.py:222
+msgid "Updating /etc/samba/smb.conf file..."
+msgstr ""
+
+#: src/config_manager.py:224
+msgid "Updated /etc/samba/smb.conf file..."
+msgstr ""
+
+#: src/config_manager.py:251
+msgid "Updating /etc/sssd/sssd.conf file..."
+msgstr ""
+
+#: src/config_manager.py:256
+msgid "Updated /etc/sssd/sssd.conf file..."
+msgstr ""
+
+#: src/config_manager.py:291
+msgid "Updating /etc/samba/smb.conf file for winbind..."
+msgstr ""
+
+#: src/config_manager.py:294
+msgid "Updated /etc/samba/smb.conf file for winbind..."
+msgstr ""
+
+#: src/config_manager.py:325
+msgid "Updating /etc/nsswitch.conf file for winbind..."
+msgstr ""
+
+#: src/config_manager.py:328
+msgid "Updated /etc/nsswitch.conf file for winbind..."
+msgstr ""
+
+#: src/domain_joiner_ldap.py:32
+msgid "Failed to initialize LDAP connection:"
+msgstr ""
+
+#: src/domain_joiner_ldap.py:59
+msgid "LDAP search failed:"
+msgstr ""
+
+#: src/domain_operations.py:82 src/domain_operations.py:159
+msgid "krb5.conf not found. Required packages might be missing."
+msgstr ""
+
+#: src/domain_operations.py:88
+msgid "Domain discovered..."
+msgstr ""
+
+#: src/domain_operations.py:90 src/domain_operations.py:155
+msgid "Domain not found:"
+msgstr ""
+
+#: src/domain_operations.py:93
+msgid "Error discovering the domain. Exit Code:"
+msgstr ""
+
+#: src/domain_operations.py:94
+msgid "Domain discovery failed."
+msgstr ""
+
+#: src/domain_operations.py:105 src/domain_operations.py:107
+#: src/domain_operations.py:183 src/domain_operations.py:185
+msgid "Organizational Unit format is not correct."
+msgstr ""
+
+#: src/domain_operations.py:106 src/domain_operations.py:184
+msgid "Example: OU=Users,DC=example,DC=com"
+msgstr ""
+
+#: src/domain_operations.py:139 src/domain_operations.py:227
+msgid "=== Restoring Configuration Files from Backup ==="
+msgstr ""
+
+#: src/domain_operations.py:162
+msgid "Updating /etc/krb5.conf file..."
+msgstr ""
+
+#: src/domain_operations.py:165
+msgid "Updated /etc/krb5.conf file..."
+msgstr ""
+
+#: src/domain_operations.py:173
+msgid "Couldn't discovered the domain"
+msgstr ""
+
+#: src/domain_operations.py:198
+msgid "Services are starting..."
+msgstr ""
+
+#: src/domain_operations.py:202
+msgid "Done!"
+msgstr ""
+
+#: src/domain_operations.py:206
+msgid "This computer has been successfully added to the domain."
+msgstr ""
+
+#: src/domain_operations.py:260
+msgid ""
+"No domain join method selected. Please specify either realmd or winbind."
+msgstr ""
+
+#: src/domain_operations.py:263
+msgid "An error occurred during the join process: {}"
+msgstr ""

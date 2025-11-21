@@ -8,6 +8,20 @@ from pardus_domain_joiner import domain_joiner_winbind
 from pardus_domain_joiner import config_manager
 from pardus_domain_joiner import update_krb5_config
 
+import locale
+from locale import gettext as _
+
+# Development: ../locale, Production: /usr/share/locale
+localedir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../locale')
+if not os.path.exists(localedir):
+    localedir = '/usr/share/locale'
+
+SYSTEM_LANGUAGE = os.environ.get("LANG")
+locale.setlocale(locale.LC_ALL, os.environ.get("LANG"))
+
+locale.bindtextdomain('pardus-lib-domain-joiner', localedir)
+locale.textdomain('pardus-lib-domain-joiner')
+
 
 def discover_domain(domain):
     process = subprocess.run(["nslookup", domain], capture_output=True, text=True)
@@ -62,22 +76,22 @@ def format_ou(ouaddress):
 def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     restore_files = {"krb5": "/etc/krb5.conf", "sssd": "/etc/sssd/sssd.conf"}
 
-    print("STEP===Discovering domain...", flush=True)
+    print("STEP===Discovering the domain...", flush=True)
     if not os.path.isfile("/etc/krb5.conf"):
         return fail_and_return(
-            "krb5.conf not found. Required packages might be missing."
+            _("krb5.conf not found. Required packages might be missing.")
         )
 
     try:
         result = domain_joiner_realmd.discover(domain)
         if result:
-            print("Domain discovered...")
+            print(_("Domain discovered..."))
         else:
-            return fail_and_return("Domain not found:" + f" '{domain}'")
+            return fail_and_return(_("Domain not found:") + f" '{domain}'")
 
     except subprocess.CalledProcessError as e:
-        print("Error discovering domain. Exit Code:", e.returncode)
-        return fail_and_return("Domain discovery failed.")
+        print(_("Error discovering the domain. Exit Code:"), e.returncode)
+        return fail_and_return(_("Domain discovery failed."))
 
     print("STEP===Backup configuration files...", flush=True)
 
@@ -88,9 +102,9 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     print("STEP===Organizational Unit format check...", flush=True)
 
     if ouaddress and not format_ou(ouaddress):
-        print("Organizational Unit format is not correct.")
-        print("Example: OU=Users,DC=example,DC=com")
-        return fail_and_return("Organizational Unit format is not correct.")
+        print(_("Organizational Unit format is not correct."))
+        print(_("Example: OU=Users,DC=example,DC=com"))
+        return fail_and_return(_("Organizational Unit format is not correct."))
 
     print("STEP===Joining the domain with sssd...", flush=True)
     process = domain_joiner_realmd.join(domain, user, passwd, ouaddress)
@@ -122,7 +136,7 @@ def handle_realmd_join(comp_name, domain, user, passwd, ouaddress):
     msg = fail_and_return(process.stderr)
 
     print(" ")
-    print("=== Restoring Configuration Files from Backup ===")
+    print(_("=== Restoring Configuration Files from Backup ==="))
     restore_config_file(restore_files)
 
     return msg
@@ -138,17 +152,17 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
     print("STEP===Discovering the domain...", flush=True)
     found_domain = discover_domain(domain)
     if not found_domain:
-        return fail_and_return("Domain not found:" + f" '{domain}'")
+        return fail_and_return(_("Domain not found:") + f" '{domain}'")
 
     if not os.path.isfile("/etc/krb5.conf"):
         return fail_and_return(
-            "krb5.conf not found. Required packages might be missing."
+            _("krb5.conf not found. Required packages might be missing.")
         )
 
-    print("Updating /etc/krb5.conf file...")
+    print(_("Updating /etc/krb5.conf file..."))
     config_manager.backup_config_file("/etc/krb5.conf", "krb5")
     update_krb5_config.update_krb5_conf(domain)
-    print("Updated /etc/krb5.conf file...")
+    print(_("Updated /etc/krb5.conf file..."))
     config_manager.update_samba_conf_for_winbind(domain, workgroup)
 
     p_discover = domain_joiner_winbind.discover()
@@ -156,7 +170,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
         print("discover stdout:", p_discover.stdout, flush=True)
         eprint("discover stderr:" + p_discover.stderr)
         restore_config_file(restore_files)
-        return fail_and_return("Couldn't discovered the domain")
+        return fail_and_return(_("Couldn't discovered the domain"))
 
     print("STEP===Updating configuration files...", flush=True)
     config_manager.update_nsswitch_conf()
@@ -166,9 +180,9 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
     print("STEP===Organizational Unit format check...", flush=True)
 
     if ouaddress and not format_ou(ouaddress):
-        print("Organizational Unit format is not correct.")
-        print("Example: OU=Users,DC=example,DC=com")
-        return fail_and_return("Organizational Unit format is not correct.")
+        print(_("Organizational Unit format is not correct."))
+        print(_("Example: OU=Users,DC=example,DC=com"))
+        return fail_and_return(_("Organizational Unit format is not correct."))
 
     print("STEP===Joining the domain with winbind...", flush=True)
     process = domain_joiner_winbind.join(user, passwd, ouaddress)
@@ -181,15 +195,15 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
             ["kinit", domain_user], input=passwd + "\n", text=True, capture_output=True
         )
 
-        print("Services are starting...", end="", flush=True)
+        print(_("Services are starting..."), end="", flush=True)
         subprocess.run(["systemctl", "restart", "smbd.service"], capture_output=True)
         subprocess.run(["systemctl", "restart", "nmbd.service"], capture_output=True)
         subprocess.run(["systemctl", "restart", "winbind.service"], capture_output=True)
-        print("Done!")
+        print(_("Done!"))
 
         p_domaininfo = domain_joiner_winbind.domain_info()
         if p_domaininfo.returncode == 0:
-            print("This computer has been successfully added to the domain.")
+            print(_("This computer has been successfully added to the domain."))
             return ""
         else:
             print(
@@ -210,7 +224,7 @@ def handle_winbind_join(comp_name, domain, user, passwd, ouaddress, workgroup):
     msg = fail_and_return(process.stdout)
 
     print(" ")
-    print("=== Restoring Configuration Files from Backup ===")
+    print(_("=== Restoring Configuration Files from Backup ==="))
     restore_config_file(restore_files)
 
     return msg
@@ -243,10 +257,10 @@ def join(
                 comp_name, domain, user, passwd, ouaddress, workgroup
             )
         else:
-            return "No domain join method selected. Please specify either realmd or winbind."
+            return _("No domain join method selected. Please specify either realmd or winbind.")
 
     except subprocess.CalledProcessError as e:
-        return f"An error occurred during the join process: {e.stderr}"
+        return _("An error occurred during the join process: {}").format(e.stderr)
 
 
 def leave(user, password, realmd=None, winbind=None):

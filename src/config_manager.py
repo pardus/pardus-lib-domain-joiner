@@ -5,6 +5,20 @@ import subprocess
 import re
 from datetime import datetime
 
+import locale
+from locale import gettext as _
+
+# Development: ../locale, Production: /usr/share/locale
+localedir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../locale')
+if not os.path.exists(localedir):
+    localedir = '/usr/share/locale'
+
+SYSTEM_LANGUAGE = os.environ.get("LANG")
+locale.setlocale(locale.LC_ALL, os.environ.get("LANG"))
+
+locale.bindtextdomain('pardus-lib-domain-joiner', localedir)
+locale.textdomain('pardus-lib-domain-joiner')
+
 # to backup files
 backup_dir = "/usr/share/pardus_domain_joiner/backups"
 
@@ -18,9 +32,9 @@ def set_hostname(comp_name):
         backup_config_file("/etc/hostname", "hostname")
         update_hosts_file(comp_name)
         subprocess.call(["hostnamectl", "hostname", comp_name])
-        print("Changed hostname: ", comp_name)
+        print(_("Changed hostname: "), comp_name)
     else:
-        print("ERROR: You entered an invalid hostname.")
+        print(_("ERROR: You entered an invalid hostname."))
 
 
 def restore_hostname():
@@ -29,13 +43,13 @@ def restore_hostname():
         with open(backup_hostname, "r") as f:
             comp_name = f.read().strip()
         subprocess.call(["hostnamectl", "hostname", comp_name])
-        print("Restored hostname file: ", comp_name)
+        print(_("Restored hostname file: "), comp_name)
         restore_config_file("hosts", "/etc/hosts")
         restore_config_file("hostname", "/etc/hostname")
 
 
 def start_sssd_service():
-    print("Starting sssd service...")
+    print(_("Starting sssd service..."))
     subprocess.run(["systemctl", "stop", "winbind.service"], capture_output=True)
     subprocess.run(["systemctl", "disable", "winbind.service"], capture_output=True)
     subprocess.run(["systemctl", "start", "sssd.service"], capture_output=True)
@@ -43,7 +57,7 @@ def start_sssd_service():
 
 
 def start_winbind_service():
-    print("Starting winbind service...")
+    print(_("Starting winbind service..."))
     subprocess.run(["systemctl", "stop", "sssd.service"], capture_output=True)
     subprocess.run(["systemctl", "disable", "sssd.service"], capture_output=True)
     subprocess.run(["systemctl", "start", "winbind.service"], capture_output=True)
@@ -60,9 +74,9 @@ def backup_config_file(source_file, backup_name):
             shutil.copy2(source_file, backup_file)
             print(f"{source_file} backed up.")
         except Exception as e:
-            print(f"An error occurred while backing up {source_file}. Error: {e}")
+            print(_("An error occurred while backing up {}. Error: {}").format(source_file, e))
     else:
-        print(f"There is no such file: {source_file}.")
+        print(_("There is no such file: {}.").format(source_file))
 
 
 """def get_latest_backup(target_file):
@@ -88,21 +102,21 @@ def backup_config_file(source_file, backup_name):
 def restore_config_file(backup_name, source_file):
     backup_file = os.path.join(backup_dir, backup_name)
     if not backup_file or not os.path.exists(backup_file):
-        print(f"No backup found for {backup_file}")
+        print(_("No backup found for "), backup_file)
         return
 
     if os.path.exists(source_file):
         try:
             shutil.copy2(backup_file, source_file)
-            print(f"{source_file} has been restored from backup.")
+            print(_("{} has been restored from backup.").format(source_file))
 
             # Remove old backup to prevent restoring it again
             os.remove(backup_file)
 
         except Exception as e:
-            print(f"An error occurred while restoring {source_file}. Error: {e}")
+            print(_("An error occurred while restoring {}. Error: {}").format(source_file, e))
     else:
-        print(f"There is no such file: {backup_file}.")
+        print(_("There is no such file: {}.").format(backup_file))
 
 
 def update_hostname_file(comp_name, domain=None):
@@ -114,15 +128,15 @@ def update_hostname_file(comp_name, domain=None):
 
     with open(hostname_file, "r") as file:
         current_hostname = file.readline().strip()
-        print("Checking /etc/hostname file...")
+        print(_("Checking /etc/hostname file..."))
         if full_hostname not in current_hostname:
             subprocess.call(["hostnamectl", "set-hostname", full_hostname])
-            print("Added domain name to /etc/hostname file")
+            print(_("Added domain name to /etc/hostname file"))
             """with open(hostname_file, "w") as file:
                 new_hostname = f"{full_hostname}"
                 file.write(new_hostname)"""
         else:
-            print("Done")
+            print(_("Done"))
 
 
 def update_hosts_file(comp_name, domain=None):
@@ -130,7 +144,7 @@ def update_hosts_file(comp_name, domain=None):
     hosts_file = "/etc/hosts"
 
     if not os.path.isfile(hosts_file):
-        print("/etc/hosts not found.")
+        print(_("/etc/hosts not found."))
         return False
 
     backup_config_file(hosts_file, "hosts")
@@ -138,7 +152,7 @@ def update_hosts_file(comp_name, domain=None):
     with open(hosts_file, "r") as file:
         lines = file.readlines()
 
-    print("Checking /etc/hosts file...")
+    print(_("Checking /etc/hosts file..."))
 
     new_hosts_file = []
     updated = False
@@ -162,9 +176,9 @@ def update_hosts_file(comp_name, domain=None):
         file.writelines(new_hosts_file)
 
     if updated:
-        print("Done")
+        print(_("Done"))
     else:
-        print("Added hostname to /etc/hosts file")
+        print(_("Added hostname to /etc/hosts file"))
 
 
 def rewrite_conf(file, settings):
@@ -205,9 +219,9 @@ def update_samba_conf_for_sssd(domain):
             "syslog": 0,
         },
     }
-    print("Updating /etc/samba/smb.conf file...")
+    print(_("Updating /etc/samba/smb.conf file..."))
     rewrite_conf(smb_file, samba_settings)
-    print("Updated /etc/samba/smb.conf file...")
+    print(_("Updated /etc/samba/smb.conf file..."))
 
 
 def update_sssd_conf(domain):
@@ -234,12 +248,12 @@ def update_sssd_conf(domain):
             "ad_gpo_ignore_unreadable": True,
         },
     }
-    print("Updating /etc/sssd/sssd.conf file...")
+    print(_("Updating /etc/sssd/sssd.conf file..."))
     rewrite_conf(sssd_file, sssd_settings)
     os.chmod(sssd_file, 0o600)  # -rw------
     os.chown(sssd_file, 0, 0)  # root:root
     subprocess.call(["systemctl", "restart", "sssd.service"])
-    print("Updated /etc/sssd/sssd.conf file...")
+    print(_("Updated /etc/sssd/sssd.conf file..."))
 
 
 def update_samba_conf_for_winbind(domain, workgroup):
@@ -274,10 +288,10 @@ def update_samba_conf_for_winbind(domain, workgroup):
             "restrict anonymous": "2",
         },
     }
-    print("Updating /etc/samba/smb.conf file for winbind...")
+    print(_("Updating /etc/samba/smb.conf file for winbind..."))
     rewrite_conf(smb_file, samba_settings)
     os.chmod(smb_file, 0o755)
-    print("Updated /etc/samba/smb.conf file for winbind...")
+    print(_("Updated /etc/samba/smb.conf file for winbind..."))
 
 
 def update_nsswitch_conf():
@@ -308,7 +322,7 @@ def update_nsswitch_conf():
         else:
             new_lines.append(line)
 
-    print("Updating /etc/nsswitch.conf file for winbind...")
+    print(_("Updating /etc/nsswitch.conf file for winbind..."))
     with open(nsswitch_file, "w") as file:
         file.writelines(new_lines)
-    print("Updated /etc/nsswitch.conf file for winbind...")
+    print(_("Updated /etc/nsswitch.conf file for winbind..."))

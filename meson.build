@@ -19,6 +19,21 @@ py.install_sources(
   ],
   subdir: 'pardus_domain_joiner',
 )
+
+langs = ['tr', 'pt']
+
+foreach lang : langs
+    install_data(
+        'po/' + lang + '/LC_MESSAGES/pardus-lib-domain-joiner.mo',
+        install_dir: '/usr/share/locale/' + lang + '/LC_MESSAGES'
+    )
+endforeach
+
+install_data(
+    'po/tr/LC_MESSAGES/pardus-lib-domain-joiner.mo',
+    install_dir: join_paths(get_option('prefix'), 'share/locale/tr/LC_MESSAGES')
+)
+
 install_data(
   'data/pardus-pam-config', install_dir:'/usr/share/pam-configs', rename:'pardus-domain-joiner'
 )

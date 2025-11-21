@@ -1,0 +1,235 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# busra.cagliyan <busra.cagliyan@pardus.org.tr>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-11-21 15:47+0300\n"
+"PO-Revision-Date: 2025-11-21 14:09+0300\n"
+"Last-Translator: busra.cagliyan <busra.cagliyan@pardus.org.tr>\n"
+"Language-Team: Turkish <dev@pardus.org.tr>\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"X-Generator: Gtranslator 42.0\n"
+
+#: src/config_manager.py:35
+msgid "Changed hostname: "
+msgstr "Bilgisayar adı değiştirildi: "
+
+#: src/config_manager.py:37
+msgid "ERROR: You entered an invalid hostname."
+msgstr "HATA: Geçersiz bir bilgisayar adı girdiniz."
+
+#: src/config_manager.py:46
+msgid "Restored hostname file: "
+msgstr "Hostname dosyası geri yüklendi: "
+
+#: src/config_manager.py:52
+msgid "Starting sssd service..."
+msgstr "SSSD servisi başlatılıyor..."
+
+#: src/config_manager.py:60
+msgid "Starting winbind service..."
+msgstr "Winbind servisi başlatılıyor..."
+
+#: src/config_manager.py:77
+msgid "An error occurred while backing up {}. Error: {}"
+msgstr "{} yedeklenirken bir hata oluştu. Hata: {}"
+
+#: src/config_manager.py:79 src/config_manager.py:119
+msgid "There is no such file: {}."
+msgstr "Böyle bir dosya yok: {}."
+
+#: src/config_manager.py:105
+msgid "No backup found for "
+msgstr " için yedek bulunamadı"
+
+#: src/config_manager.py:111
+msgid "{} has been restored from backup."
+msgstr "{} yedekten geri yüklendi."
+
+#: src/config_manager.py:117
+msgid "An error occurred while restoring {}. Error: {}"
+msgstr "{} geri yüklenirken bir hata oluştu. Hata: {}"
+
+#: src/config_manager.py:131
+msgid "Checking /etc/hostname file..."
+msgstr "/etc/hostname dosyası kontrol ediliyor..."
+
+#: src/config_manager.py:134
+msgid "Added domain name to /etc/hostname file"
+msgstr "/etc/hostname dosyasına etki alanı adı eklendi"
+
+#: src/config_manager.py:139 src/config_manager.py:179
+msgid "Done"
+msgstr "Bitti"
+
+#: src/config_manager.py:147
+msgid "/etc/hosts not found."
+msgstr "/etc/hosts bulunamadı."
+
+#: src/config_manager.py:155
+msgid "Checking /etc/hosts file..."
+msgstr "/etc/hosts dosyası kontrol ediliyor..."
+
+#: src/config_manager.py:181
+msgid "Added hostname to /etc/hosts file"
+msgstr "/etc/hosts dosyasına bilgisayar adı eklendi"
+
+#: src/config_manager.py:222
+msgid "Updating /etc/samba/smb.conf file..."
+msgstr "/etc/samba/smb.conf dosyası güncelleniyor..."
+
+#: src/config_manager.py:224
+msgid "Updated /etc/samba/smb.conf file..."
+msgstr "/etc/samba/smb.conf dosyası güncellendi..."
+
+#: src/config_manager.py:251
+msgid "Updating /etc/sssd/sssd.conf file..."
+msgstr "/etc/sssd/sssd.conf dosyası güncelleniyor..."
+
+#: src/config_manager.py:256
+msgid "Updated /etc/sssd/sssd.conf file..."
+msgstr "/etc/sssd/sssd.conf dosyası güncellendi..."
+
+#: src/config_manager.py:291
+msgid "Updating /etc/samba/smb.conf file for winbind..."
+msgstr "Winbind için /etc/samba/smb.conf dosyası güncelleniyor..."
+
+#: src/config_manager.py:294
+msgid "Updated /etc/samba/smb.conf file for winbind..."
+msgstr "Winbind için /etc/samba/smb.conf dosyası güncellendi..."
+
+#: src/config_manager.py:325
+msgid "Updating /etc/nsswitch.conf file for winbind..."
+msgstr "Winbind için /etc/nsswitch.conf dosyası güncelleniyor..."
+
+#: src/config_manager.py:328
+msgid "Updated /etc/nsswitch.conf file for winbind..."
+msgstr "Winbind için /etc/nsswitch.conf dosyası güncellendi..."
+
+#: src/domain_joiner_ldap.py:32
+msgid "Failed to initialize LDAP connection:"
+msgstr "LDAP bağlantısı başlatılamadı:"
+
+#: src/domain_joiner_ldap.py:59
+msgid "LDAP search failed:"
+msgstr "LDAP araması başarısız oldu:"
+
+#: src/domain_operations.py:82 src/domain_operations.py:159
+msgid "krb5.conf not found. Required packages might be missing."
+msgstr "krb5.conf bulunamadı. Gerekli paketler eksik olabilir."
+
+#: src/domain_operations.py:88
+msgid "Domain discovered..."
+msgstr "Etki alanı keşfedildi…"
+
+#: src/domain_operations.py:90 src/domain_operations.py:155
+msgid "Domain not found:"
+msgstr "Etki alanı bulunamadı:"
+
+#: src/domain_operations.py:93
+#, fuzzy
+msgid "Error discovering the domain. Exit Code:"
+msgstr "Etki alanı keşfedilirken hata oluştu. Çıkış Kodu:"
+
+#: src/domain_operations.py:94
+msgid "Domain discovery failed."
+msgstr "Etki alanı keşfi başarısız oldu."
+
+#: src/domain_operations.py:105 src/domain_operations.py:107
+#: src/domain_operations.py:183 src/domain_operations.py:185
+msgid "Organizational Unit format is not correct."
+msgstr "Organizasyon Birim formatı doğru değil."
+
+#: src/domain_operations.py:106 src/domain_operations.py:184
+msgid "Example: OU=Users,DC=example,DC=com"
+msgstr "Örnek: OU=Users,DC=example,DC=com"
+
+#: src/domain_operations.py:139 src/domain_operations.py:227
+msgid "=== Restoring Configuration Files from Backup ==="
+msgstr "=== Yedekten Yapılandırma Dosyaları Geri Yükleniyor ==="
+
+#: src/domain_operations.py:162
+msgid "Updating /etc/krb5.conf file..."
+msgstr "/etc/krb5.conf dosyası güncelleniyor..."
+
+#: src/domain_operations.py:165
+msgid "Updated /etc/krb5.conf file..."
+msgstr "/etc/krb5.conf dosyası güncellendi..."
+
+#: src/domain_operations.py:173
+msgid "Couldn't discovered the domain"
+msgstr "Etki alanı bulunamadı."
+
+#: src/domain_operations.py:198
+msgid "Services are starting..."
+msgstr "Servisler başlatılıyor..."
+
+#: src/domain_operations.py:202
+msgid "Done!"
+msgstr "Bitti!"
+
+#: src/domain_operations.py:206
+msgid "This computer has been successfully added to the domain."
+msgstr "Bu bilgisayar etki alanına başarıyla eklendi."
+
+#: src/domain_operations.py:260
+msgid ""
+"No domain join method selected. Please specify either realmd or winbind."
+msgstr ""
+"Etki alanına katılma yöntemi seçilmedi. Lütfen realmd veya winbind "
+"yöntemlerinden birini belirtin."
+
+#: src/domain_operations.py:263
+msgid "An error occurred during the join process: {}"
+msgstr "Katılma işlemi sırasında bir hata oluştu: {}"
+
+#~ msgid "STEP===Discovering the domain..."
+#~ msgstr "ADIM===Etki alanı keşfediliyor…"
+
+#~ msgid "STEP===Backup configuration files..."
+#~ msgstr "ADIM===Yapılandırma dosyalarını yedekleniyor..."
+
+#~ msgid "STEP===Organizational Unit format check..."
+#~ msgstr "ADIM===Organizasyon Birimi formatı kontrol ediliyor…"
+
+#~ msgid "STEP===Joining the domain with sssd..."
+#~ msgstr "ADIM===SSSD ile etki alanına dahil ediliyor…"
+
+#~ msgid "STEP===Updating configuration files..."
+#~ msgstr "ADIM===Yapılandırma dosyaları güncelleniyor..."
+
+#~ msgid "STEP===Enabling Pardus PAM Config..."
+#~ msgstr "ADIM===Pardus PAM Yapılandırması Etkinleştiriliyor..."
+
+#~ msgid "STEP===Success."
+#~ msgstr "ADIM===Başarılı."
+
+#~ msgid "STEP===Joining the domain with winbind..."
+#~ msgstr "ADIM===Winbind ile etki alanına dahil ediliyor…"
+
+#~ msgid "STEP===Starting sssd service..."
+#~ msgstr "ADIM===SSSD servisi başlatılıyor..."
+
+#~ msgid "STEP===Starting winbind service..."
+#~ msgstr "ADIM===Winbind servisi başlatılıyor..."
+
+#~ msgid "STEP===Leaving Started..."
+#~ msgstr "ADIM===Ayrılma işlemi başlatıldı…"
+
+#~ msgid "STEP===Restarting winbind service..."
+#~ msgstr "ADIM===Winbind servisi yeniden başlatılıyor..."
+
+#~ msgid "STEP===Restoring configuration files..."
+#~ msgstr "ADIM===Yapılandırma Dosyaları Geri Yükleniyor..."
+
+#~ msgid "STEP===Discovering domain..."
+#~ msgstr "ADIM===Etki alanı keşfediliyor..."
