@@ -1,3 +1,10 @@
+pardus-lib-domain-joiner (0.2.7) yirmiuc; urgency=medium
+
+  [ busra ]
+  * i18n: add POTFILES
+
+ -- Büşra ÇAĞLIYAN <busra.cagliyan@pardus.org.tr>  Sun, 23 Nov 2025 17:55:03 +0300
+
 pardus-lib-domain-joiner (0.2.6) yirmiuc; urgency=medium
 
   [ busra ]
