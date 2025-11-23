@@ -1,3 +1,13 @@
+pardus-lib-domain-joiner (0.2.5) yirmiuc; urgency=medium
+
+  [ busra ]
+  * Add translation infrastructure (po files and Meson integration)
+
+  [ Fatih Altun ]
+  * Update debian standards
+
+ -- Fatih Altun <fatih.altun@pardus.org.tr>  Sun, 23 Nov 2025 16:17:00 +0300
+
 pardus-lib-domain-joiner (0.2.4) yirmiuc; urgency=medium
 
   [ busra ]
