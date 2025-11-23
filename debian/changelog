@@ -1,3 +1,10 @@
+pardus-lib-domain-joiner (0.2.6) yirmiuc; urgency=medium
+
+  [ busra ]
+  * fix(build): generate missing .mo files during Meson build
+
+ -- Büşra ÇAĞLIYAN <busra.cagliyan@pardus.org.tr>  Sun, 23 Nov 2025 17:18:00 +0300
+
 pardus-lib-domain-joiner (0.2.5) yirmiuc; urgency=medium
 
   [ busra ]
