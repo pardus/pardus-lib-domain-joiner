@@ -1,3 +1,4 @@
+import logging
 import ldap
 import os
 
@@ -15,6 +16,9 @@ locale.setlocale(locale.LC_ALL, os.environ.get("LANG"))
 locale.bindtextdomain('pardus-lib-domain-joiner', localedir)
 locale.textdomain('pardus-lib-domain-joiner')
 
+# Logger
+logger = logging.getLogger(__name__)
+
 class LDAP:
     def __init__(self, address, username, password):
         self.address = address  # domain name or ip
@@ -29,7 +33,8 @@ class LDAP:
             self.conn.protocol_version = 3
             self.conn.set_option(ldap.OPT_REFERRALS, 0)
         except ldap.LDAPError as e:
-            print(_("Failed to initialize LDAP connection:"), e)
+            #print(_("Failed to initialize LDAP connection:"), e)
+            logger.exception(_("Failed to initialize LDAP connection: %s"), e)
             self.conn = None
 
     def authenticate(self):
@@ -38,7 +43,7 @@ class LDAP:
             self._connect()
 
         self.conn.simple_bind_s(self.username, self.password)
-        # print(_("LDAP authentication successful!"))
+        # logger.info(_("LDAP authentication successful!"))
 
     def check_computer_exists_in_ad(self, hostname):
         """Check if the given hostname already exists in Active Directory."""
@@ -56,7 +61,8 @@ class LDAP:
 
             return False
         except ldap.LDAPError as e:
-            print(_("LDAP search failed:"), e)
+            #print(_("LDAP search failed:"), e)
+            logger.exception(_("LDAP search failed:"), e)
             return None
 
     def _build_domain_controller(self):
@@ -68,4 +74,4 @@ class LDAP:
         """Close the LDAP connection."""
         if self.conn:
             self.conn.unbind_s()
-            # print(_("Connection closed."))
+            # logger.info(_("Connection closed."))
