@@ -16,6 +16,7 @@ py.install_sources(
     'src/domain_joiner_winbind.py',
     'src/domain_operations.py',
     'src/update_krb5_config.py',
+    'src/logger.py',
   ],
   subdir: 'pardus_domain_joiner',
 )

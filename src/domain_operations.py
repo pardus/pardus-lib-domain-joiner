@@ -1,4 +1,4 @@
-import logging
+from logger import get_logger
 import os
 import re
 import subprocess
@@ -24,7 +24,7 @@ locale.bindtextdomain('pardus-lib-domain-joiner', localedir)
 locale.textdomain('pardus-lib-domain-joiner')
 
 # Logger
-logger = logging.getLogger(__name__)
+logger = get_logger("domain_operations")
 
 def discover_domain(domain):
     process = subprocess.run(["nslookup", domain], capture_output=True, text=True)

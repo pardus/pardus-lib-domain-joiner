@@ -4,7 +4,7 @@ import shutil
 import subprocess
 import re
 from datetime import datetime
-import logging
+from logger import get_logger
 import locale
 from locale import gettext as _
 
@@ -20,7 +20,7 @@ locale.bindtextdomain('pardus-lib-domain-joiner', localedir)
 locale.textdomain('pardus-lib-domain-joiner')
 
 # Logger
-logger = logging.getLogger(__name__)
+logger = get_logger("config_manager")
 
 # to backup files
 backup_dir = "/usr/share/pardus_domain_joiner/backups"
