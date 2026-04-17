@@ -1,6 +1,7 @@
-from logger import get_logger
 import ldap
 import os
+
+from pardus_domain_joiner import logger
 
 import locale
 from locale import gettext as _
@@ -17,7 +18,7 @@ locale.bindtextdomain('pardus-lib-domain-joiner', localedir)
 locale.textdomain('pardus-lib-domain-joiner')
 
 # Logger
-logger = get_logger("domain_joiner_ldap")
+logger = logger.get_logger("domain_joiner_ldap")
 
 class LDAP:
     def __init__(self, address, username, password):

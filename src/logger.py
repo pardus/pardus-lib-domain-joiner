@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import os
+import pwd
 import sys
 from pathlib import Path
 
@@ -9,6 +11,17 @@ import gi
 
 gi.require_version("GLib", "2.0")
 from gi.repository import GLib
+
+
+def get_user_cache_dir():
+    sudo_user = os.environ.get("SUDO_USER")
+
+    if sudo_user:
+        home_dir = Path(pwd.getpwnam(sudo_user).pw_dir)
+    else:
+        home_dir = Path.home()
+
+    return home_dir / ".cache"
 
 
 def get_logger(name: str) -> logging.Logger:
@@ -19,11 +32,11 @@ def get_logger(name: str) -> logging.Logger:
     if logger.handlers:
         return
 
-    # ./cache/pardus/pardus-domain-joiner/
-    logdir = Path(GLib.get_user_cache_dir()) / "pardus" / "pardus-domain-joiner"
+    # ~/./cache/pardus/pardus-domain-joiner/
+    logdir = get_user_cache_dir() / "pardus" / "pardus-domain-joiner"
     logdir.mkdir(parents=True, exist_ok=True)
 
-    logfile = logdir / "pardus-lib-domain-joiner.log"
+    logfile = logdir / "pardus-domain-joiner.log"
 
     formatter = logging.Formatter(
         "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s",
@@ -47,6 +60,6 @@ def get_logger(name: str) -> logging.Logger:
     logger.addHandler(stream_handler)
 
     logger.debug("Logger setup completed.")
-    logger.info("%s is starting.", sys.argv[0])
+    logger.debug("%s is starting.", sys.argv[0])
 
     return logger

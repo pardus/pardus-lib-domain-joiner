@@ -1,4 +1,3 @@
-from logger import get_logger
 import os
 import re
 import subprocess
@@ -8,6 +7,7 @@ from pardus_domain_joiner import domain_joiner_realmd
 from pardus_domain_joiner import domain_joiner_winbind
 from pardus_domain_joiner import config_manager
 from pardus_domain_joiner import update_krb5_config
+from pardus_domain_joiner import logger
 
 import locale
 from locale import gettext as _
@@ -24,7 +24,7 @@ locale.bindtextdomain('pardus-lib-domain-joiner', localedir)
 locale.textdomain('pardus-lib-domain-joiner')
 
 # Logger
-logger = get_logger("domain_operations")
+logger = logger.get_logger("domain_operations")
 
 def discover_domain(domain):
     process = subprocess.run(["nslookup", domain], capture_output=True, text=True)
