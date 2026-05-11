@@ -13,15 +13,17 @@ gi.require_version("GLib", "2.0")
 from gi.repository import GLib
 
 
-def get_user_cache_dir():
+def get_log_path():
     sudo_user = os.environ.get("SUDO_USER")
 
     if sudo_user:
-        home_dir = Path(pwd.getpwnam(sudo_user).pw_dir)
+        log_path = Path("/var/log/pardus/pardus-domain-joiner")
     else:
-        home_dir = Path.home()
+        log_path = Path.home() / ".cache" / "pardus" / "pardus-domain-joiner"
 
-    return home_dir / ".cache"
+    log_path.mkdir(parents=True, exist_ok=True)
+
+    return log_path
 
 
 def get_logger(name: str) -> logging.Logger:
@@ -32,11 +34,8 @@ def get_logger(name: str) -> logging.Logger:
     if logger.handlers:
         return
 
-    # ~/./cache/pardus/pardus-domain-joiner/
-    logdir = get_user_cache_dir() / "pardus" / "pardus-domain-joiner"
-    logdir.mkdir(parents=True, exist_ok=True)
-
-    logfile = logdir / "pardus-domain-joiner.log"
+    # ~/./cache/pardus/pardus-domain-joiner/ or /var/log
+    logfile = get_log_path() / "pardus-domain-joiner.log"
 
     formatter = logging.Formatter(
         "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s",
