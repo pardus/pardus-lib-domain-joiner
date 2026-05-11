@@ -55,7 +55,7 @@ def eprint(msg):
 
 def fail_and_return(msg):
     # print(msg, file=sys.stderr, flush=True)
-    logger.error(_("FAIL: %s"), msg)
+    logger.error(_("%s"), msg)
     config_manager.restore_hostname()
 
     return msg
