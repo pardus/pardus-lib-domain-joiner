@@ -1,3 +1,13 @@
+pardus-lib-domain-joiner (0.2.8) yirmiuc; urgency=medium
+
+  * add logging
+  * refactor(logging): centralize logger setup into get_logger utility
+  * Add helper to resolve user's home directory
+  * Fix permission issues by updating log file destination
+  * Simplify error message output
+
+ -- Büşra ÇAĞLIYAN <busra.cagliyan@pardus.org.tr>  Wed, 17 Jun 2026 09:34:05 +0300
+
 pardus-lib-domain-joiner (0.2.7) yirmiuc; urgency=medium
 
   [ busra ]
