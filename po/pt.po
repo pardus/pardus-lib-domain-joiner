@@ -1,188 +1,188 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Hugo Carvalho <hugokarvalho@hotmail.com>, 2026.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-11-21 15:47+0300\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2026-10-19 14:46+0100\n"
+"Last-Translator: Hugo Carvalho <hugokarvalho@hotmail.com>\n"
+"Language-Team: \n"
+"Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.10\n"
 
 #: src/config_manager.py:35
 msgid "Changed hostname: "
-msgstr ""
+msgstr "Nome do host alterado: "
 
 #: src/config_manager.py:37
 msgid "ERROR: You entered an invalid hostname."
-msgstr ""
+msgstr "ERRO: inseriu um nome de host inválido."
 
 #: src/config_manager.py:46
 msgid "Restored hostname file: "
-msgstr ""
+msgstr "Ficheiro de nome de host restaurado: "
 
 #: src/config_manager.py:52
 msgid "Starting sssd service..."
-msgstr ""
+msgstr "A iniciar o serviço sssd..."
 
 #: src/config_manager.py:60
 msgid "Starting winbind service..."
-msgstr ""
+msgstr "A iniciar o serviço winbind..."
 
 #: src/config_manager.py:77
 msgid "An error occurred while backing up {}. Error: {}"
-msgstr ""
+msgstr "Ocorreu um erro durante a cópia de segurança de {}. Erro: {}"
 
 #: src/config_manager.py:79 src/config_manager.py:119
 msgid "There is no such file: {}."
-msgstr ""
+msgstr "Não existe nenhum ficheiro com esse nome: {}."
 
 #: src/config_manager.py:105
 msgid "No backup found for "
-msgstr ""
+msgstr "Não foi encontrada nenhuma cópia de segurança para "
 
 #: src/config_manager.py:111
 msgid "{} has been restored from backup."
-msgstr ""
+msgstr "{} foi restaurado a partir da cópia de segurança."
 
 #: src/config_manager.py:117
 msgid "An error occurred while restoring {}. Error: {}"
-msgstr ""
+msgstr "Ocorreu um erro ao restaurar {}. Erro: {}"
 
 #: src/config_manager.py:131
 msgid "Checking /etc/hostname file..."
-msgstr ""
+msgstr "A verificar o ficheiro /etc/hostname..."
 
 #: src/config_manager.py:134
 msgid "Added domain name to /etc/hostname file"
-msgstr ""
+msgstr "Adicionado nome de domínio ao ficheiro /etc/hostname"
 
 #: src/config_manager.py:139 src/config_manager.py:179
 msgid "Done"
-msgstr ""
+msgstr "Concluído"
 
 #: src/config_manager.py:147
 msgid "/etc/hosts not found."
-msgstr ""
+msgstr "/etc/hosts não encontrado."
 
 #: src/config_manager.py:155
 msgid "Checking /etc/hosts file..."
-msgstr ""
+msgstr "A verificar o ficheiro /etc/hosts..."
 
 #: src/config_manager.py:181
 msgid "Added hostname to /etc/hosts file"
-msgstr ""
+msgstr "Adicionado o nome de host ao ficheiro /etc/hosts"
 
 #: src/config_manager.py:222
 msgid "Updating /etc/samba/smb.conf file..."
-msgstr ""
+msgstr "A atualizar o ficheiro /etc/samba/smb.conf..."
 
 #: src/config_manager.py:224
 msgid "Updated /etc/samba/smb.conf file..."
-msgstr ""
+msgstr "Atualizado o ficheiro /etc/samba/smb.conf..."
 
 #: src/config_manager.py:251
 msgid "Updating /etc/sssd/sssd.conf file..."
-msgstr ""
+msgstr "A atualizar o ficheiro /etc/sssd/sssd.conf..."
 
 #: src/config_manager.py:256
 msgid "Updated /etc/sssd/sssd.conf file..."
-msgstr ""
+msgstr "Atualizado o ficheiro /etc/sssd/sssd.conf..."
 
 #: src/config_manager.py:291
 msgid "Updating /etc/samba/smb.conf file for winbind..."
-msgstr ""
+msgstr "A atualizar o ficheiro /etc/samba/smb.conf para o winbind..."
 
 #: src/config_manager.py:294
 msgid "Updated /etc/samba/smb.conf file for winbind..."
-msgstr ""
+msgstr "Atualizado o ficheiro /etc/samba/smb.conf para o winbind..."
 
 #: src/config_manager.py:325
 msgid "Updating /etc/nsswitch.conf file for winbind..."
-msgstr ""
+msgstr "A atualizar o ficheiro /etc/nsswitch.conf para o winbind..."
 
 #: src/config_manager.py:328
 msgid "Updated /etc/nsswitch.conf file for winbind..."
-msgstr ""
+msgstr "Atualizado o ficheiro /etc/nsswitch.conf para o winbind..."
 
 #: src/domain_joiner_ldap.py:32
 msgid "Failed to initialize LDAP connection:"
-msgstr ""
+msgstr "Erro na inicialização da ligação LDAP:"
 
 #: src/domain_joiner_ldap.py:59
 msgid "LDAP search failed:"
-msgstr ""
+msgstr "Erro na pesquisa LDAP:"
 
 #: src/domain_operations.py:82 src/domain_operations.py:159
 msgid "krb5.conf not found. Required packages might be missing."
-msgstr ""
+msgstr "Não foi encontrado o ficheiro krb5.conf. Podem faltar alguns pacotes necessários."
 
 #: src/domain_operations.py:88
 msgid "Domain discovered..."
-msgstr ""
+msgstr "Domínio detetado..."
 
 #: src/domain_operations.py:90 src/domain_operations.py:155
 msgid "Domain not found:"
-msgstr ""
+msgstr "Domínio não encontrado:"
 
 #: src/domain_operations.py:93
 msgid "Error discovering the domain. Exit Code:"
-msgstr ""
+msgstr "Erro ao detetar o domínio. Código de saída:"
 
 #: src/domain_operations.py:94
 msgid "Domain discovery failed."
-msgstr ""
+msgstr "Erro na deteção do domínio."
 
 #: src/domain_operations.py:105 src/domain_operations.py:107
 #: src/domain_operations.py:183 src/domain_operations.py:185
 msgid "Organizational Unit format is not correct."
-msgstr ""
+msgstr "O formato da Unidade Organizacional não está correto."
 
 #: src/domain_operations.py:106 src/domain_operations.py:184
 msgid "Example: OU=Users,DC=example,DC=com"
-msgstr ""
+msgstr "Exemplo: OU=Utilizadores,DC=exemplo,DC=com"
 
 #: src/domain_operations.py:139 src/domain_operations.py:227
 msgid "=== Restoring Configuration Files from Backup ==="
-msgstr ""
+msgstr "=== Restaurar ficheiros de configuração a partir de uma cópia de segurança ==="
 
 #: src/domain_operations.py:162
 msgid "Updating /etc/krb5.conf file..."
-msgstr ""
+msgstr "A atualizar o ficheiro /etc/krb5.conf..."
 
 #: src/domain_operations.py:165
 msgid "Updated /etc/krb5.conf file..."
-msgstr ""
+msgstr "Atualizado o ficheiro /etc/krb5.conf..."
 
 #: src/domain_operations.py:173
 msgid "Couldn't discovered the domain"
-msgstr ""
+msgstr "Não foi possível localizar o domínio"
 
 #: src/domain_operations.py:198
 msgid "Services are starting..."
-msgstr ""
+msgstr "Os serviços estão a iniciar..."
 
 #: src/domain_operations.py:202
 msgid "Done!"
-msgstr ""
+msgstr "Concluído!"
 
 #: src/domain_operations.py:206
 msgid "This computer has been successfully added to the domain."
-msgstr ""
+msgstr "Este computador foi adicionado com sucesso ao domínio."
 
 #: src/domain_operations.py:260
-msgid ""
-"No domain join method selected. Please specify either realmd or winbind."
-msgstr ""
+msgid "No domain join method selected. Please specify either realmd or winbind."
+msgstr "Não foi selecionado nenhum método de integração no domínio. Especifique realmd ou winbind."
 
 #: src/domain_operations.py:263
 msgid "An error occurred during the join process: {}"
-msgstr ""
+msgstr "Ocorreu um erro durante o processo de junção: {}"
